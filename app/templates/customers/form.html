@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% from "_forms.html" import render_field %}
+{% block title %}{{ title }} — SecureStock{% endblock %}
+{% block content %}
+<h1 class="h3">{{ title }}</h1>
+<form method="post" class="card card-body shadow-card" style="max-width:640px">
+{{ form.hidden_tag() }}
+{{ render_field(form.name) }}
+{{ render_field(form.email) }}
+{{ render_field(form.phone) }}
+{{ form.submit(class="btn btn-primary") }}
+</form>
+{% endblock %}

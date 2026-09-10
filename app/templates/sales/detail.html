@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Sale #{{ sale.id }} — SecureStock{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center">
+<h1 class="h3">Sale #{{ sale.id }}</h1>
+<a class="btn btn-outline-secondary" href="{{ url_for('sales.index') }}">&larr; Back</a>
+</div>
+<div class="row g-3 my-2">
+  <div class="col-md-4"><div class="card shadow-card"><div class="card-body"><div class="text-muted small">Customer</div><strong>{{ sale.customer.name }}</strong></div></div></div>
+  <div class="col-md-4"><div class="card shadow-card"><div class="card-body"><div class="text-muted small">Created by</div><strong>{{ sale.user.name }}</strong></div></div></div>
+  <div class="col-md-4"><div class="card shadow-card"><div class="card-body"><div class="text-muted small">Total</div><strong>${{ "%.2f"|format(sale.total) }}</strong></div></div></div>
+</div>
+<div class="table-responsive">
+<table class="table bg-white shadow-card align-middle">
+<thead><tr><th>Product</th><th>Quantity</th><th>Unit Price</th><th>Line Total</th></tr></thead>
+<tbody>
+{% for item in sale.items %}
+<tr>
+<td>{{ item.product.name }}</td>
+<td>{{ item.quantity }}</td>
+<td>${{ "%.2f"|format(item.unit_price) }}</td>
+<td>${{ "%.2f"|format(item.unit_price * item.quantity) }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+
+<div class="card shadow-card mt-4">
+<div class="card-header bg-white fw-semibold">Invoice attachment</div>
+<div class="card-body">
+<form method="post" enctype="multipart/form-data" action="{{ url_for('sales.upload', sale_id=sale.id) }}">
+{{ upload_form.hidden_tag() }}
+{{ upload_form.file(class="form-control mb-2") }}
+<div class="form-text text-muted mb-2">Allowed: .pdf, .png, .jpg, .jpeg, .txt (max 2 MB). Content signature is validated.</div>
+{{ upload_form.submit(class="btn btn-secondary") }}
+</form>
+</div>
+</div>
+{% endblock %}

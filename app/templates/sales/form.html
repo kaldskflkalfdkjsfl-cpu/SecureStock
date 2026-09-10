@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% from "_forms.html" import render_select, render_field %}
+{% block title %}Create Sale — SecureStock{% endblock %}
+{% block content %}
+<h1 class="h3">Create Sale</h1>
+<form method="post" class="card card-body shadow-card" style="max-width:640px">
+{{ form.hidden_tag() }}
+{{ render_select(form.customer_id) }}
+{{ render_select(form.product_id) }}
+{{ render_field(form.quantity) }}
+{{ form.submit(class="btn btn-success") }}
+</form>
+{% endblock %}

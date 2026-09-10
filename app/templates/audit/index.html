@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% from "_pagination.html" import render_pagination %}
+{% block title %}Audit Log — SecureStock{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center">
+<h1 class="h3">Audit Log</h1>
+</div>
+<form class="my-3" method="get">
+  <div class="input-group" style="max-width:380px">
+    <input name="action" value="{{ action }}" class="form-control" placeholder="Filter by action (e.g. LOGIN_SUCCESS)">
+    <button class="btn btn-outline-secondary" type="submit">Filter</button>
+  </div>
+</form>
+<div class="table-responsive">
+<table class="table table-striped bg-white shadow-card align-middle">
+<thead><tr><th>ID</th><th>Time</th><th>User</th><th>Action</th><th>Entity</th><th>IP Address</th></tr></thead>
+<tbody>
+{% for log in logs.items %}
+<tr>
+<td>{{ log.id }}</td>
+<td>{{ log.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+<td>{% if log.user %}{{ log.user.email }}{% else %}<span class="text-muted">anonymous</span>{% endif %}</td>
+<td><span class="badge bg-secondary">{{ log.action }}</span></td>
+<td>{{ log.entity }}{% if log.entity_id %} #{{ log.entity_id }}{% endif %}</td>
+<td class="font-monospace small">{{ log.ip_address or '—' }}</td>
+</tr>
+{% else %}
+<tr><td colspan="6" class="text-center text-muted py-4">No audit records found.</td></tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+{{ render_pagination(logs, 'audit.index') }}
+{% endblock %}

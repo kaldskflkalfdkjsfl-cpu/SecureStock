@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Set Up Two-Factor — SecureStock{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-md-7">
+<h1 class="h3">Set Up Two-Factor Authentication</h1>
+<div class="card shadow-card">
+<div class="card-body">
+<p class="text-muted">Scan the QR code with an authenticator app (Google Authenticator, Authy, Microsoft Authenticator, etc.), then enter the 6-digit code to confirm.</p>
+<div class="text-center my-3"><img src="{{ qr_data }}" alt="TOTP QR code" class="img-fluid border rounded"></div>
+<div class="alert alert-light border small">
+  <strong>Manual entry secret:</strong> <code class="user-select-all">{{ secret }}</code>
+</div>
+<form method="post" class="row g-2" style="max-width:420px">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="col-12">
+    <label class="form-label">6-digit verification code</label>
+    <input class="form-control" name="code" inputmode="numeric" maxlength="6" placeholder="123456" required>
+  </div>
+  <div class="col-auto"><button class="btn btn-success" name="confirm" value="1">Verify and Enable</button></div>
+  <div class="col-auto"><button class="btn btn-outline-secondary" name="cancel" value="1" formaction="{{ url_for('profile.cancel') }}">Cancel</button></div>
+</form>
+</div>
+</div>
+</div>
+</div>
+{% endblock %}

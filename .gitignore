@@ -1,0 +1,41 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+*.egg
+build/
+dist/
+.eggs/
+
+# --- Virtual environments ---
+.venv/
+venv/
+env/
+
+# --- Environment / secrets ---
+.env
+
+# --- Databases & uploads ---
+instance/
+*.db
+*.sqlite3
+uploads/*
+!uploads/.gitkeep
+
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# --- Testing / tooling ---
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.coverage
+
+# --- Security scan reports ---
+bandit-report.txt

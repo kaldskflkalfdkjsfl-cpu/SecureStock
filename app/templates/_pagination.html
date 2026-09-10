@@ -1,0 +1,24 @@
+{% macro render_pagination(page, endpoint) %}
+{% if page.pages > 1 %}
+<nav aria-label="Pagination">
+  <ul class="pagination pagination-sm justify-content-center">
+    <li class="page-item {% if not page.has_prev %}disabled{% endif %}">
+      <a class="page-link" href="{{ url_for(endpoint, page=page.prev_num, q=request.args.get('q',''), action=request.args.get('action','')) }}">&laquo;</a>
+    </li>
+    {% for p in page.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+      {% if p %}
+        <li class="page-item {% if p == page.page %}active{% endif %}">
+          <a class="page-link" href="{{ url_for(endpoint, page=p, q=request.args.get('q',''), action=request.args.get('action','')) }}">{{ p }}</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
+      {% endif %}
+    {% endfor %}
+    <li class="page-item {% if not page.has_next %}disabled{% endif %}">
+      <a class="page-link" href="{{ url_for(endpoint, page=page.next_num, q=request.args.get('q',''), action=request.args.get('action','')) }}">&raquo;</a>
+    </li>
+  </ul>
+</nav>
+<span class="d-block text-center text-muted small">{{ page.total }} item(s) &mdash; page {{ page.page }} of {{ page.pages }}</span>
+{% endif %}
+{% endmacro %}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% from "_pagination.html" import render_pagination %}
+{% block title %}Users — SecureStock{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center">
+<h1 class="h3">Users</h1><a class="btn btn-primary" href="{{ url_for('users.create') }}">+ Create User</a>
+</div>
+<div class="table-responsive mt-3">
+<table class="table table-striped bg-white shadow-card align-middle">
+<thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Action</th></tr></thead>
+<tbody>
+{% for u in users.items %}
+<tr><td>{{ u.id }}</td><td>{{ u.name }}</td><td>{{ u.email }}</td><td><span class="badge bg-secondary">{{ u.role }}</span></td>
+<td>
+{% if u.is_locked() %}<span class="badge bg-danger">Locked</span>
+{% else %}<span class="badge bg-success">Active</span>{% endif %}
+</td>
+<td>
+{% if u.id != current_user.id %}
+<form method="post" action="{{ url_for('users.delete', user_id=u.id) }}" class="d-inline">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<button class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete user?')">Delete</button>
+</form>
+{% else %}<span class="text-muted small">You</span>{% endif %}
+</td></tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+{{ render_pagination(users, 'users.index') }}
+{% endblock %}

@@ -1,0 +1,26 @@
+[project]
+name = "securestock"
+version = "2.0.0"
+description = "Secure Inventory & Sales Management System — secure programming practical project"
+requires-python = ">=3.11"
+readme = "README.md"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = [
+    "ignore::sqlalchemy.exc.LegacyAPIWarning",
+]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "SIM"]
+ignore = [
+    "S101",  # assert allowed (tests use assertions; app code is reviewed)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S105"]  # test fixtures intentionally use fixed demo credentials

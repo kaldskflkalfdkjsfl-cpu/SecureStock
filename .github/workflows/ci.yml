@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test-and-lint:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Lint with ruff
+        run: ruff check app tests
+
+      - name: Run tests with coverage
+        env:
+          SECRET_KEY: ci-test-secret-key-not-for-production
+          FERNET_KEY: G2JqrCrOuuATxQgASq3rjN2wAzhW6NRkj6xkuv8pIpI=
+        run: pytest
+
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Bandit security scan (app)
+        run: bandit -r app -f txt -q
+
+      - name: Check for hardcoded secrets
+        run: |
+          ! grep -rniE "(change-me|changeme|secret_key\s*=\s*['\"][^'\"]+['\"])" app config.py || exit 1
+          echo "No obvious hardcoded secrets found."

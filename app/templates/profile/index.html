@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}My Profile — SecureStock{% endblock %}
+{% block content %}
+<h1 class="h3">My Profile</h1>
+<div class="card shadow-card" style="max-width:640px">
+<div class="card-body">
+<p><strong>Name:</strong> {{ current_user.name }}</p>
+<p><strong>Email:</strong> {{ current_user.email }}</p>
+<p><strong>Role:</strong> <span class="badge bg-secondary">{{ current_user.role }}</span></p>
+<div class="border-top pt-3 mt-3">
+<h6 class="fw-semibold">Two-Factor Authentication (TOTP)</h6>
+{% if current_user.two_factor_enabled %}
+  <p><span class="badge bg-success">Enabled</span> Your account requires a 6-digit code from an authenticator app at every login.</p>
+  <form method="post" class="row g-2" style="max-width:400px">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="col-12">
+      <label class="form-label">Current code to disable</label>
+      <input class="form-control" name="code" inputmode="numeric" maxlength="6" placeholder="123456" required>
+    </div>
+    <div class="col-auto"><button class="btn btn-outline-danger" name="disable" value="1">Disable 2FA</button></div>
+  </form>
+{% else %}
+  <p><span class="badge bg-secondary">Disabled</span> Protect your account by requiring a second factor at login.</p>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="btn btn-primary" name="enable" value="1">Enable Two-Factor Authentication</button>
+  </form>
+{% endif %}
+</div>
+</div>
+</div>
+{% endblock %}

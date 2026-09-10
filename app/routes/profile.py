@@ -1,0 +1,87 @@
+from base64 import b64encode
+from io import BytesIO
+
+import qrcode
+from flask import Blueprint, flash, redirect, render_template, request, session, url_for
+from flask_login import current_user, login_required
+
+from ..extensions import db
+from ..models import AuditLog
+from ..security import generate_totp_secret, totp_provisioning_uri
+
+profile_bp = Blueprint("profile", __name__, url_prefix="/profile")
+
+def _qr_png(uri: str) -> str:
+    img = qrcode.make(uri, box_size=5, border=2)
+    buffer = BytesIO()
+    img.save(buffer, format="PNG")
+    return "data:image/png;base64," + b64encode(buffer.getvalue()).decode()
+
+@profile_bp.route("/", methods=["GET", "POST"])
+@login_required
+def index():
+    pending_secret = session.get("tfa_pending_secret")
+
+    if request.method == "POST":
+        from ..security import verify_totp_code
+
+        if request.form.get("disable"):
+            if not current_user.two_factor_enabled:
+                flash("Two-factor authentication is already disabled.", "warning")
+                return redirect(url_for("profile.index"))
+            if verify_totp_code(current_user.totp_secret, request.form.get("code", "")):
+                current_user.totp_secret = None
+                db.session.add(AuditLog(user_id=current_user.id, action="TFA_DISABLED",
+                                        entity="User", entity_id=current_user.id,
+                                        ip_address=request.remote_addr))
+                db.session.commit()
+                flash("Two-factor authentication disabled.", "info")
+                return redirect(url_for("profile.index"))
+            flash("Invalid verification code.", "danger")
+            return redirect(url_for("profile.index"))
+
+        if request.form.get("enable"):
+            secret = generate_totp_secret()
+            session["tfa_pending_secret"] = secret
+            uri = totp_provisioning_uri(secret, current_user.email)
+            db.session.add(AuditLog(user_id=current_user.id, action="TFA_ENROLL_STARTED",
+                                    entity="User", entity_id=current_user.id,
+                                    ip_address=request.remote_addr))
+            db.session.commit()
+            return render_template("profile/two_factor.html", qr_data=_qr_png(uri),
+                                   provisioning_uri=uri, secret=secret, pending=True)
+
+        secret = pending_secret or (
+            current_user.totp_secret if current_user.two_factor_enabled else None
+        )
+        if not secret:
+            flash("No pending two-factor setup.", "warning")
+            return redirect(url_for("profile.index"))
+
+        if request.form.get("confirm") and verify_totp_code(secret, request.form.get("code", "")):
+            current_user.totp_secret = secret
+            session.pop("tfa_pending_secret", None)
+            db.session.add(AuditLog(user_id=current_user.id, action="TFA_ENABLED",
+                                    entity="User", entity_id=current_user.id,
+                                    ip_address=request.remote_addr))
+            db.session.commit()
+            flash("Two-factor authentication enabled.", "success")
+            return redirect(url_for("profile.index"))
+
+        flash("Invalid verification code.", "danger")
+        return redirect(url_for("profile.index"))
+
+    # GET: show setup screen if a pending secret exists
+    if pending_secret and not current_user.two_factor_enabled:
+        uri = totp_provisioning_uri(pending_secret, current_user.email)
+        return render_template("profile/two_factor.html", qr_data=_qr_png(uri),
+                               provisioning_uri=uri, secret=pending_secret, pending=True)
+
+    return render_template("profile/index.html")
+
+@profile_bp.route("/cancel", methods=["POST"])
+@login_required
+def cancel():
+    session.pop("tfa_pending_secret", None)
+    flash("Two-factor setup cancelled.", "info")
+    return redirect(url_for("profile.index"))
