@@ -8,6 +8,9 @@
 <p><strong>Email:</strong> {{ current_user.email }}</p>
 <p><strong>Role:</strong> <span class="badge bg-secondary">{{ current_user.role }}</span></p>
 <div class="border-top pt-3 mt-3">
+<a class="btn btn-outline-secondary btn-sm" href="{{ url_for('profile.change_password') }}">Change password</a>
+</div>
+<div class="border-top pt-3 mt-3">
 <h6 class="fw-semibold">Two-Factor Authentication (TOTP)</h6>
 {% if current_user.two_factor_enabled %}
   <p><span class="badge bg-success">Enabled</span> Your account requires a 6-digit code from an authenticator app at every login.</p>

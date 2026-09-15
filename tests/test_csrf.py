@@ -10,13 +10,12 @@ from tests.conftest import DEMO_PASSWORD
 
 def _csrf_enabled_app():
     fd, path = tempfile.mkstemp()
-    app = create_app()
-    app.config.update(
-        TESTING=True,
-        SQLALCHEMY_DATABASE_URI=f"sqlite:///{path}",
-        WTF_CSRF_ENABLED=True,
-        RATELIMIT_ENABLED=False,
-    )
+    app = create_app({
+        "TESTING": True,
+        "SQLALCHEMY_DATABASE_URI": f"sqlite:///{path}",
+        "WTF_CSRF_ENABLED": True,
+        "RATELIMIT_ENABLED": False,
+    })
     with app.app_context():
         db.drop_all()
         db.create_all()
@@ -48,6 +47,8 @@ def test_post_without_csrf_token_is_rejected():
     })
     assert resp.status_code == 400
 
+    with app.app_context():
+        db.engine.dispose()
     os.close(fd)
     os.unlink(path)
 
@@ -77,5 +78,7 @@ def test_post_with_valid_csrf_token_is_accepted():
     assert resp.status_code == 200
     assert "With CSRF" in resp.get_data(as_text=True)
 
+    with app.app_context():
+        db.engine.dispose()
     os.close(fd)
     os.unlink(path)

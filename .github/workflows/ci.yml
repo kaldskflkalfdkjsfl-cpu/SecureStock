@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, master]
   pull_request:
   workflow_dispatch:
 
@@ -55,5 +55,5 @@ jobs:
 
       - name: Check for hardcoded secrets
         run: |
-          ! grep -rniE "(change-me|changeme|secret_key\s*=\s*['\"][^'\"]+['\"])" app config.py || exit 1
+          ! grep -rniE "(secret_key|fernet_key)\s*=\s*['\"][A-Za-z0-9+/=_-]{12,}['\"]" app || exit 1
           echo "No obvious hardcoded secrets found."

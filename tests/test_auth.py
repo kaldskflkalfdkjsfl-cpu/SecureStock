@@ -80,13 +80,12 @@ def test_rate_limit_blocks_excessive_logins():
     from app.security import hash_password
 
     fd, path = tempfile.mkstemp()
-    app = create_app()
-    app.config.update(
-        TESTING=True,
-        SQLALCHEMY_DATABASE_URI=f"sqlite:///{path}",
-        WTF_CSRF_ENABLED=False,
-        RATELIMIT_ENABLED=True,
-    )
+    app = create_app({
+        "TESTING": True,
+        "SQLALCHEMY_DATABASE_URI": f"sqlite:///{path}",
+        "WTF_CSRF_ENABLED": False,
+        "RATELIMIT_ENABLED": True,
+    })
     with app.app_context():
         db.drop_all()
         db.create_all()
@@ -105,6 +104,8 @@ def test_rate_limit_blocks_excessive_logins():
     resp = client.post("/login", data={"email": "rl@test.example.com", "password": "bad"},
                        follow_redirects=True)
     assert resp.status_code == 429
+    with app.app_context():
+        db.engine.dispose()
     os.close(fd)
     os.unlink(path)
 

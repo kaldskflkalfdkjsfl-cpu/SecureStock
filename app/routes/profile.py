@@ -3,11 +3,18 @@ from io import BytesIO
 
 import qrcode
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
-from flask_login import current_user, login_required
+from flask_login import current_user, login_required, login_user
 
-from ..extensions import db
+from ..extensions import db, limiter
+from ..forms import ChangePasswordForm
 from ..models import AuditLog
-from ..security import generate_totp_secret, totp_provisioning_uri
+from ..security import (
+    generate_totp_secret,
+    hash_password,
+    totp_provisioning_uri,
+    validate_password,
+    verify_password,
+)
 
 profile_bp = Blueprint("profile", __name__, url_prefix="/profile")
 
@@ -85,3 +92,39 @@ def cancel():
     session.pop("tfa_pending_secret", None)
     flash("Two-factor setup cancelled.", "info")
     return redirect(url_for("profile.index"))
+
+@profile_bp.route("/password", methods=["GET", "POST"])
+@login_required
+@limiter.limit("10 per minute")
+def change_password():
+    form = ChangePasswordForm()
+    if form.validate_on_submit():
+        if not verify_password(current_user.password_hash, form.current_password.data):
+            flash("Current password is incorrect.", "danger")
+            return render_template("profile/password.html", form=form)
+
+        if form.new_password.data != form.confirm_password.data:
+            flash("New passwords do not match.", "danger")
+            return render_template("profile/password.html", form=form)
+
+        if not validate_password(form.new_password.data):
+            flash(
+                "Password must be 10+ chars and include upper, lower, digit and symbol.",
+                "danger",
+            )
+            return render_template("profile/password.html", form=form)
+
+        if form.new_password.data == form.current_password.data:
+            flash("The new password must differ from the current password.", "danger")
+            return render_template("profile/password.html", form=form)
+
+        current_user.password_hash = hash_password(form.new_password.data)
+        db.session.add(AuditLog(user_id=current_user.id, action="PASSWORD_CHANGED",
+                                entity="User", entity_id=current_user.id,
+                                ip_address=request.remote_addr))
+        db.session.commit()
+        # Refresh the session so the new password hash is re-validated server-side.
+        login_user(current_user, remember=False, fresh=True)
+        flash("Password changed successfully.", "success")
+        return redirect(url_for("profile.index"))
+    return render_template("profile/password.html", form=form)

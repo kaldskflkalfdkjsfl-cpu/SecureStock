@@ -24,6 +24,8 @@ rollback, RBAC, and a hardened production deployment pipeline.
   inventory adjustments, user/sale operations) is persisted and viewable by admins.
 - **Observability & ops** — pagination everywhere, styled error pages, waitress production
   server, Docker images, GitHub Actions CI, Flask-Migrate schema versioning.
+- **Credential lifecycle** — users change their own password (current password required);
+  admins reset any user's password, which also clears an account lockout.
 
 ## 1. Installation
 
@@ -103,7 +105,7 @@ ruff check app tests
 # Static security scan (bandit)
 bandit -r app
 
-# Full test suite (74 tests, ~90% coverage)
+# Full test suite (84 tests, ~91% coverage)
 pytest --cov=app --cov-report=term-missing
 ```
 
@@ -136,8 +138,9 @@ SecureStock/
 │       ├── audit.py         # admin audit-trail viewer
 │       └── profile.py       # TOTP 2FA enrollment/disable
 ├── migrations/              # Alembic/flask-migrate versions
-├── tests/                   # 74 automated tests (auth, rbac, csrf, xss/sqli,
-│                            # upload, sales, data protection, audit, inventory, profile, crud)
+├── tests/                   # 84 automated tests (auth, rbac, csrf, xss/sqli,
+│                            # upload, sales, data protection, audit, inventory,
+│                            # profile, crud)
 ├── docs/
 │   ├── security_documentation.md
 │   ├── ERD.md
@@ -209,6 +212,7 @@ Full documentation: `docs/security_documentation.md`.
 10. Customer phone stored encrypted (Fernet) at rest; password stored as scrypt hash.
 11. Inventory can never go negative at the application layer.
 12. Every login/lockout/TFA/CRUD event appears in the admin audit trail.
+13. Changing your password requires the current password; resets by an admin clear locks.
 
 ## 10. Important academic note
 

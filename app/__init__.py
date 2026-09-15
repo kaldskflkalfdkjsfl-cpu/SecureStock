@@ -9,9 +9,11 @@ from .models import User
 from .security_headers import register_security_headers
 
 
-def create_app():
+def create_app(overrides: dict | None = None):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_object(Config)
+    if overrides:
+        app.config.update(overrides)
 
     Path(app.instance_path).mkdir(parents=True, exist_ok=True)
     Path(app.config["UPLOAD_FOLDER"]).mkdir(parents=True, exist_ok=True)

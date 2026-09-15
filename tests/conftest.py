@@ -17,13 +17,12 @@ DEMO_PASSWORD = "ChangeMe123!"
 
 def _make_in_memory_app():
     db_fd, db_path = tempfile.mkstemp()
-    app = create_app()
-    app.config.update(
-        TESTING=True,
-        SQLALCHEMY_DATABASE_URI=f"sqlite:///{db_path}",
-        WTF_CSRF_ENABLED=False,
-        RATELIMIT_ENABLED=False,
-    )
+    app = create_app({
+        "TESTING": True,
+        "SQLALCHEMY_DATABASE_URI": f"sqlite:///{db_path}",
+        "WTF_CSRF_ENABLED": False,
+        "RATELIMIT_ENABLED": False,
+    })
     return app, db_fd, db_path
 
 
@@ -53,6 +52,9 @@ def app():
     with app.app_context():
         db.session.remove()
         db.drop_all()
+    # Dispose the engine before closing the file on Windows.
+    with app.app_context():
+        db.engine.dispose()
     os.close(db_fd)
     os.unlink(db_path)
 

@@ -17,13 +17,12 @@ from app.security import hash_password
 @pytest.fixture()
 def app():
     db_fd, db_path = tempfile.mkstemp()
-    app = create_app()
-    app.config.update(
-        TESTING=True,
-        SQLALCHEMY_DATABASE_URI=f"sqlite:///{db_path}",
-        WTF_CSRF_ENABLED=False,
-        RATELIMIT_ENABLED=False,
-    )
+    app = create_app({
+        "TESTING": True,
+        "SQLALCHEMY_DATABASE_URI": f"sqlite:///{db_path}",
+        "WTF_CSRF_ENABLED": False,
+        "RATELIMIT_ENABLED": False,
+    })
     with app.app_context():
         db.drop_all()
         db.create_all()
@@ -41,6 +40,7 @@ def app():
     with app.app_context():
         db.session.remove()
         db.drop_all()
+        db.engine.dispose()
     os.close(db_fd)
     os.unlink(db_path)
 
@@ -92,4 +92,12 @@ def test_safe_upload_path_security(app):
 
         with pytest.raises(ValueError):
             safe_upload_path("../../")
+
+
+def test_fixture_app_uses_temporary_database(app):
+    """Guard: test apps must never bind to the production instance DB."""
+    uri = app.config["SQLALCHEMY_DATABASE_URI"]
+    assert uri.startswith("sqlite:///")
+    assert "SecureStock/instance/securestock.db" not in uri
+    assert "instance" not in uri.lower()
 

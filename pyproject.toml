@@ -9,6 +9,7 @@ readme = "README.md"
 testpaths = ["tests"]
 filterwarnings = [
     "ignore::sqlalchemy.exc.LegacyAPIWarning",
+    "ignore::ResourceWarning",  # benign sqlite temp-db artifacts in tests
 ]
 addopts = "-q"
 

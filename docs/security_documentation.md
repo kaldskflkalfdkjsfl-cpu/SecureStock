@@ -167,6 +167,7 @@ plus static analysis (ruff) and an automated security scan (bandit — 0 issues)
 | 3-attempt lockout | User.failed_attempts + locked_until |
 | Constant-time login anti-enumeration | DUMMY_HASH compare + generic message |
 | TOTP 2FA | pyotp secret + verify + QR provisioning |
+| Password change/reset | ChangePasswordForm + ResetPasswordForm, verified current password |
 | Audit trail | AuditLog (admin viewer with pagination) |
 | Pagination | per-page on every list page |
 | CI | GitHub Actions (ruff + bandit + pytest) |
@@ -189,7 +190,9 @@ FR9: Sensitive customer phone numbers are encrypted at rest.
 FR10: The system blocks an account after 3 failed attempts.  
 FR11: Users can enable / disable TOTP two-factor authentication from their profile.  
 FR12: The login flow requires a TOTP code for accounts with 2FA enabled.  
-FR13: All list pages are paginated.
+FR13: All list pages are paginated.  
+FR14: Users can change their own password after verifying their current password.  
+FR15: An admin can reset another user's password; the reset also clears any lockout.
 
 ---
 
@@ -215,3 +218,7 @@ FR13: All list pages are paginated.
 18. As a user, enable TOTP 2FA in Profile → scan the QR → confirm with the app code
     → log out → log in → the second-factor screen requires a TOTP code.
 19. As Admin, open `/audit/` and show TFA_ENROLL_STARTED / TFA_ENABLED and LOGIN events.
+20. As a user, change your password (requires the current password) → old password no
+    longer works; the change appears in the audit trail.
+21. As Admin, reset an employee's password from the Users page → the employee can log in
+    with the new password, and PASSWORD_RESET is recorded.

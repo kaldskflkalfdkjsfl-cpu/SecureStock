@@ -10,6 +10,9 @@ password_hash
 role
 failed_attempts
 locked_until
+totp_secret          -- base32 secret when TOTP 2FA is enabled
+two_factor_enabled   -- derived property: bool(totp_secret)
+created_at
 
 CUSTOMER
 --------
@@ -44,9 +47,9 @@ quantity
 unit_price
 
 AUDIT_LOG
----------
+----------
 id PK
-user_id FK -> USER.id
+user_id FK -> USER.id (nullable — system events have no actor)
 action
 entity
 entity_id

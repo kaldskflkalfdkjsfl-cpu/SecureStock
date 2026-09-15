@@ -76,3 +76,24 @@ class TotpForm(FlaskForm):
         ],
     )
     submit = SubmitField("Verify")
+
+class ChangePasswordForm(FlaskForm):
+    current_password = PasswordField(
+        "Current password", validators=[DataRequired(), Length(max=128)]
+    )
+    new_password = PasswordField(
+        "New password", validators=[DataRequired(), Length(max=128)]
+    )
+    confirm_password = PasswordField(
+        "Confirm new password", validators=[DataRequired(), Length(max=128)]
+    )
+    submit = SubmitField("Change Password")
+
+class ResetPasswordForm(FlaskForm):
+    new_password = PasswordField(
+        "New password", validators=[DataRequired(), Length(max=128)]
+    )
+    confirm_password = PasswordField(
+        "Confirm new password", validators=[DataRequired(), Length(max=128)]
+    )
+    submit = SubmitField("Reset Password")

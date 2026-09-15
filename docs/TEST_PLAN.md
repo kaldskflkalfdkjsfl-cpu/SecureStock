@@ -6,7 +6,7 @@ Each item below maps to at least one automated test in `tests/`. Run everything 
 pytest --cov=app --cov-report=term-missing
 ```
 
-Current: **74 automated tests, ~90% branch-free line coverage, bandit scan reports
+Current: **84 automated tests, ~91% line coverage, bandit scan reports
 0 issues across `app/`.**
 
 | ID | Test | Expected Result | Automated coverage |
@@ -40,6 +40,8 @@ Current: **74 automated tests, ~90% branch-free line coverage, bandit scan repor
 | SEC-19 | TOTP enrollment | Bad code rejected, valid code enables, code disables | `test_profile.py` |
 | SEC-20 | Self-deletion of admin | Rejected with message | `test_crud.py` |
 | SEC-21 | Missing resource | Styled 404 page | `test_crud.py` |
+| SEC-22 | Change own password | Wrong current → rejected; weak/mismatch → rejected; success → audited + old password invalid | `test_profile.py` |
+| SEC-23 | Admin password reset | Sets new password, unlocks account, audited; non-admins get 403 | `test_crud.py` |
 
 ## Evidence to capture for the report
 

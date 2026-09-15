@@ -17,6 +17,7 @@
 </td>
 <td>
 {% if u.id != current_user.id %}
+<a class="btn btn-sm btn-outline-primary" href="{{ url_for('users.reset_password', user_id=u.id) }}">Reset password</a>
 <form method="post" action="{{ url_for('users.delete', user_id=u.id) }}" class="d-inline">
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete user?')">Delete</button>
