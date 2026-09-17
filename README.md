@@ -105,7 +105,7 @@ ruff check app tests
 # Static security scan (bandit)
 bandit -r app
 
-# Full test suite (84 tests, ~91% coverage)
+# Full test suite (94 tests, ~91% coverage)
 pytest --cov=app --cov-report=term-missing
 ```
 
@@ -138,9 +138,9 @@ SecureStock/
 │       ├── audit.py         # admin audit-trail viewer
 │       └── profile.py       # TOTP 2FA enrollment/disable
 ├── migrations/              # Alembic/flask-migrate versions
-├── tests/                   # 84 automated tests (auth, rbac, csrf, xss/sqli,
+├── tests/                   # 94 automated tests (auth, rbac, csrf, xss/sqli,
 │                            # upload, sales, data protection, audit, inventory,
-│                            # profile, crud)
+│                            # profile, crud, session security)
 ├── docs/
 │   ├── security_documentation.md
 │   ├── ERD.md

@@ -1,12 +1,14 @@
 import os
 import re
+import secrets
+from datetime import UTC, datetime
 from functools import wraps
 from pathlib import Path
 
 import bleach
 import pyotp
 from cryptography.fernet import Fernet, InvalidToken
-from flask import abort, current_app
+from flask import abort, current_app, session
 from flask_login import current_user
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
@@ -61,6 +63,61 @@ def decrypt_value(value: str | None) -> str | None:
         return get_fernet().decrypt(value.encode()).decode()
     except InvalidToken:
         return "[unavailable]"
+
+SESSION_STAMP_KEY = "session_stamp"
+SESSION_STARTED_KEY = "session_started_at"
+SESSION_SEEN_KEY = "session_last_seen"
+
+
+def new_session_token() -> str:
+    """Return a fresh, unpredictable per-user session stamp."""
+    return secrets.token_urlsafe(32)
+
+
+def bind_session(user, rotate: bool = False) -> str:
+    """Bind the current browser session to the user's security stamp.
+
+    The stamp is a random value stored on the ``User`` row and mirrored inside
+    the signed session cookie. Concurrent sessions of a user share the stamp, so
+    multiple devices stay logged in at once. Rotating the stamp (``rotate=True``)
+    - done on password change, admin password reset and "sign out everywhere" -
+    instantly invalidates every other session of that user.
+    """
+    if rotate or not user.session_token:
+        user.session_token = new_session_token()
+    now = datetime.now(UTC).timestamp()
+    session[SESSION_STAMP_KEY] = user.session_token
+    session[SESSION_STARTED_KEY] = now
+    session[SESSION_SEEN_KEY] = now
+    return user.session_token
+
+
+def session_stamp_matches(user) -> bool:
+    """True when the cookie's stamp matches the user's current server-side stamp."""
+    stored = session.get(SESSION_STAMP_KEY)
+    if not user.session_token or not stored:
+        return False
+    return secrets.compare_digest(str(stored), str(user.session_token))
+
+
+def session_timed_out() -> bool:
+    """Enforce the server-side idle and absolute timeouts.
+
+    Returns True when the session has expired; otherwise refreshes the last-seen
+    marker (sliding idle window).
+    """
+    now = datetime.now(UTC).timestamp()
+    started = session.get(SESSION_STARTED_KEY)
+    seen = session.get(SESSION_SEEN_KEY)
+    if started is None or seen is None:
+        return True
+    if now - seen > current_app.config["SESSION_IDLE_TIMEOUT"]:
+        return True
+    if now - started > current_app.config["SESSION_ABSOLUTE_TIMEOUT"]:
+        return True
+    session[SESSION_SEEN_KEY] = now
+    return False
+
 
 def role_required(*roles):
     def decorator(view):

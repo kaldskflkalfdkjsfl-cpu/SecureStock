@@ -161,7 +161,7 @@ plus static analysis (ruff) and an automated security scan (bandit — 0 issues)
 | Authentication | Flask-Login |
 | Password hashing | Werkzeug scrypt |
 | Cryptography | Fernet |
-| Sessions | HttpOnly + SameSite + expiration |
+| Sessions | HttpOnly + SameSite + expiration + server-side stamp (revocable) + idle/absolute timeout |
 | Error handling | Flask error handlers + rollback |
 | Rate limiting | Flask-Limiter |
 | 3-attempt lockout | User.failed_attempts + locked_until |

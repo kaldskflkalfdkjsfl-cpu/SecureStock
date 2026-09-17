@@ -2,12 +2,15 @@
 {% from "_forms.html" import render_select, render_field %}
 {% block title %}Create Sale — SecureStock{% endblock %}
 {% block content %}
-<h1 class="h3">Create Sale</h1>
-<form method="post" class="card card-body shadow-card" style="max-width:640px">
+<h1 class="ss-page-title mb-3"><span class="ss-title-icon"><i class="bi bi-cart-plus"></i></span>Create Sale</h1>
+<form method="post" class="card card-body ss-form">
 {{ form.hidden_tag() }}
 {{ render_select(form.customer_id) }}
 {{ render_select(form.product_id) }}
 {{ render_field(form.quantity) }}
+<div>
 {{ form.submit(class="btn btn-success") }}
+<a class="btn btn-outline-secondary" href="{{ url_for('sales.index') }}">Cancel</a>
+</div>
 </form>
 {% endblock %}

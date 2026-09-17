@@ -2,14 +2,17 @@
 {% from "_forms.html" import render_field, render_select %}
 {% block title %}{{ title }} — SecureStock{% endblock %}
 {% block content %}
-<h1 class="h3">{{ title }}</h1>
-<form method="post" class="card card-body shadow-card" style="max-width:640px">
+<h1 class="ss-page-title mb-3"><span class="ss-title-icon"><i class="bi bi-person-plus"></i></span>{{ title }}</h1>
+<form method="post" class="card card-body ss-form">
 {{ form.hidden_tag() }}
 {{ render_field(form.name) }}
 {{ render_field(form.email) }}
 {{ render_select(form.role) }}
 {{ render_field(form.password) }}
-<div class="form-text text-muted mb-3">Password must be 10+ characters and include upper-case, lower-case, a digit and a symbol. Leave blank to keep the current password when editing.</div>
+<div class="form-text mb-3"><i class="bi bi-info-circle me-1"></i>Password must be 10+ characters and include upper-case, lower-case, a digit and a symbol. Leave blank to keep the current password when editing.</div>
+<div>
 {{ form.submit(class="btn btn-primary") }}
+<a class="btn btn-outline-secondary" href="{{ url_for('users.index') }}">Cancel</a>
+</div>
 </form>
 {% endblock %}

@@ -1,11 +1,12 @@
 from pathlib import Path
 
-from flask import Flask, render_template
+from flask import Flask, render_template, session
 
 from config import Config
 
 from .extensions import csrf, db, limiter, login_manager, migrate
 from .models import User
+from .security import session_stamp_matches, session_timed_out
 from .security_headers import register_security_headers
 
 
@@ -30,7 +31,17 @@ def create_app(overrides: dict | None = None):
 
     @login_manager.user_loader
     def load_user(user_id):
-        return db.session.get(User, int(user_id))
+        user = db.session.get(User, int(user_id))
+        if user is None:
+            session.clear()
+            return None
+        # Reject sessions whose server-side stamp was rotated (password change,
+        # reset, "sign out everywhere") and sessions past their idle/absolute
+        # timeouts, even though the signed cookie itself is still valid.
+        if not session_stamp_matches(user) or session_timed_out():
+            session.clear()
+            return None
+        return user
 
     @app.context_processor
     def inject_helpers():

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>الطالب الرابع — الجودة والتدقيق والنشر · SecureStock</title>
+<style>
+:root{--accent:#0f4c81;--accent2:#e8f0fa;--border:#cdd8e4;--muted:#5b6b7c}
+*{box-sizing:border-box}
+body{font-family:"Segoe UI",Tahoma,Arial,sans-serif;color:#22303c;background:#fff;margin:0 auto;max-width:960px;padding:24px 28px 60px;line-height:1.85}
+h1,h2,h3{color:var(--accent);line-height:1.5}
+h1{font-size:1.6em;margin:8px 0 6px}
+h2{border-bottom:2px solid var(--accent2);padding-bottom:6px;margin-top:32px;font-size:1.22em}
+h3{font-size:1.02em;margin-top:18px}
+header.card{background:var(--accent);color:#fff;border-radius:10px;padding:16px 22px}
+header.card h1{color:#fff;margin-top:0}
+.idbox{background:#fff;color:#22303c;border-radius:8px;padding:8px 14px;margin-top:10px;font-size:.95em}
+table{border-collapse:collapse;width:100%;margin:10px 0;font-size:.92em}
+th,td{border:1px solid var(--border);padding:7px 9px;text-align:right;vertical-align:top}
+th{background:var(--accent);color:#fff;font-weight:600}
+tr:nth-child(even) td{background:#f7fafc}
+code{font-family:Consolas,"Cascadia Mono",monospace;background:#eef3f8;border-radius:4px;padding:1px 5px;font-size:.87em;direction:ltr;display:inline-block}
+.qabox{border-right:4px solid var(--accent);background:#f3f8fd;padding:10px 14px;margin:9px 0;border-radius:6px}
+.qabox strong.q{color:var(--accent)}
+.must{background:#fff8e6;border:1px solid #f0dda0;border-radius:8px;padding:10px 14px}
+footer{margin-top:40px;border-top:1px solid var(--border);padding-top:12px;color:var(--muted);font-size:.86em}
+@media print{body{max-width:100%;padding:0}h2{break-after:avoid}table{break-inside:avoid}}
+</style>
+</head>
+<body>
+<header class="card">
+<h1>الطالب الرابع — الجودة والتدقيق والنشر</h1>
+<div>نطاق التخصص: Quality Assurance, Audit &amp; Deployment · نظام SecureStock</div>
+<div class="idbox">الاسم: ______________ &nbsp;|&nbsp; الرقم الجامعي: ______________ &nbsp;|&nbsp; القسم: ______________</div>
+</header>
+
+<h2>1) بطاقة المسؤولية</h2>
+<table>
+<tr><th>العنصر</th><th>التفاصيل</th></tr>
+<tr><td>النطاق</td><td>سجل التدقيق، الملف الشخصي و2FA، لوحة القيادة، الاختبارات، CI، النشر (Docker/Waitress)</td></tr>
+<tr><td>الملفات</td><td><code>app/routes/audit.py</code> · <code>app/routes/profile.py</code> · <code>app/routes/dashboard.py</code> · <code>tests/</code> · <code>ci.yml</code> · <code>Dockerfile</code> · <code>serve.py</code> · <code>pyproject.toml</code></td></tr>
+<tr><td>الجملة الافتتاحية</td><td>أنا مسؤول الإثبات: 94 اختباراً و91% تغطية وسجل تدقيق شامل ونشر باحتراف</td></tr>
+</table>
+
+<h2>2) ما يخصك من الكود بالتفصيل</h2>
+<h3>2.1 <code>app/routes/audit.py</code> · <code>profile.py</code> · <code>dashboard.py</code></h3>
+<table>
+<tr><th>ما أنجز</th><th>الموقع</th></tr>
+<tr><td>صفحة التدقيق: فلترة بالحدث + ترقيم (admin)</td><td><code>audit.py:9-22</code></td></tr>
+<tr><td>تفعيل 2FA: سر + QR + TFA_ENROLL_STARTED</td><td><code>profile.py:51-60</code></td></tr>
+<tr><td>تأكيد التفعيل + TFA_ENABLED</td><td><code>profile.py:62-80</code></td></tr>
+<tr><td>تعطيل 2FA برمز صحيح + TFA_DISABLED</td><td><code>profile.py:36-49</code></td></tr>
+<tr><td>تغيير كلمة المرور الذاتي (+ سياسة + تدقيق + تجديد الجلسة)</td><td><code>profile.py:97-134</code></td></tr>
+<tr><td>لوحة القيادة بمؤشرات + تنبيه نفاد + آخر أحداث</td><td><code>dashboard.py:11-19</code></td></tr>
+</table>
+
+<h3>2.2 منظومة الاختبارات — <code>tests/</code></h3>
+<table>
+<tr><th>الملف</th><th>يثبت</th><th>العدد</th></tr>
+<tr><td><code>test_auth.py</code></td><td>الدخول، القفل، TOTP، الخروج</td><td>10</td></tr>
+<tr><td><code>test_rbac.py</code></td><td>كل دور على كل مسار 200/403</td><td>12</td></tr>
+<tr><td><code>test_csrf.py</code></td><td>POST بلا رمز = 400</td><td>2</td></tr>
+<tr><td><code>test_xss_sqli.py</code></td><td><code>&lt;script&gt;</code> كنص + استعلامات LIKE</td><td>5</td></tr>
+<tr><td><code>test_upload.py</code></td><td>بايتات سحرية + مسارات + حجم</td><td>5</td></tr>
+<tr><td><code>test_sales.py</code></td><td>الذرّية + نقص المخزون</td><td>5</td></tr>
+<tr><td><code>test_data_protection.py</code></td><td>Fernet + تجزئة</td><td>6</td></tr>
+<tr><td><code>test_audit.py</code></td><td>أحداث التدقيق</td><td>6</td></tr>
+<tr><td><code>test_inventory.py</code></td><td>مخزون سالب + بحث</td><td>6</td></tr>
+<tr><td><code>test_profile.py</code></td><td>2FA + كلمة المرور</td><td>10</td></tr>
+<tr><td><code>test_crud.py</code></td><td>CRUD محمي</td><td>12</td></tr>
+<tr><td><code>test_security.py</code></td><td>القفل + الحارس + السياسة</td><td>5</td></tr>
+<tr><td><code>test_session_security.py</code></td><td>بصمة الجلسة، الجلسات المتعددة، الإبطال عند تغيير كلمة المرور/إعادة التعيين، الخروج من كل الأجهزة، مهل الخمول/المطلقة</td><td>10</td></tr>
+<tr><td colspan="2"><strong>المجموع</strong></td><td><strong>94</strong></td></tr>
+</table>
+
+<h3>2.3 النشر والجودة</h3>
+<table>
+<tr><th>ما أنجز</th><th>الموقع</th></tr>
+<tr><td>CI: Lint + pytest (3.11/3.12) + Bandit + فحص أسرار</td><td><code>.github/workflows/ci.yml</code></td></tr>
+<tr><td>خادم Waitress</td><td><code>serve.py</code></td></tr>
+<tr><td>الحاويات + مجلدات + مستخدم غير جذر</td><td><code>Dockerfile</code> + <code>docker-compose.yml</code></td></tr>
+<tr><td>ruff / coverage / filterwarnings</td><td><code>pyproject.toml</code></td></tr>
+</table>
+
+<h2>3) ما يخصك من الوثائق</h2>
+<table>
+<tr><th>الوثيقة</th><th>الأقسام</th></tr>
+<tr><td><code>docs/DELIVERABLE.md</code></td><td>§9 (التحقق والاختبار) · §10 (النشر) · §11 (دليل العرض)</td></tr>
+<tr><td><code>docs/TEST_PLAN.md</code></td><td>الملف بأكمله</td></tr>
+<tr><td><code>docs/COMPLIANCE_MATRIX_AR.md</code></td><td>PD-4 · P2-4 · PF-4 · الملخص</td></tr>
+<tr><td><code>docs/reports/bandit.html</code> + <code>coverage.xml</code></td><td>أدلة الجودة المولدة</td></tr>
+</table>
+
+<div class="must"><strong>نقاط قوتك — تعرفها إجبارياً:</strong>
+1) أرقامك الأربعة: <strong>94 اختباراً · 91% · 0 ثغرة · 13 ملفاً</strong> ·
+2) كل ملف اختبار يقابل دفاعاً (RBAC/XSS/CSRF/Upload/Sales/DataProtection/Audit) ·
+3) قصة الحارس: كان engine الإنتاج يُثبت قبل قاعدة الاختبار فتُمسح بيانات العرض ← الإصلاح ال جذري create_app(overrides) + db.engine.dispose() + اختبار حارس ·
+4) التدقيق يغطي 15+ نوع حدث بـ user/id/ip/created_at ويعرضه admin ·
+5) CI على Python 3.11/3.12 وفروع master/main ·
+6) نشر بـ Waitress + Docker بمستخدم غير جذر ·
+7) مفاتيح من البيئة تُحقن في CI كل متغيرات.</div>
+
+<h2>4) العرض الحي أمام الدكتور</h2>
+<ol>
+<li>admin ← <code>/audit</code> ← فلترة <code>SALE_CREATED</code> ← ترقيم وترتيب تنازلي.</li>
+<li><code>/profile</code> ← تفعيل 2FA برمز QR ثم تأكيد.</li>
+<li>في الطرفية: <code>pytest --cov=app -q</code> → 94 passed + نسب التغطية.</li>
+<li>افتح <code>docs/reports/bandit.html</code> (0 issues) وتقرير <code>coverage.xml</code>.</li>
+<li>اعرض <code>ci.yml</code>: Lint/Tests · Bandit · فحص أسرار.</li>
+</ol>
+
+<h2>5) أسئلة المناقشة المتوقعة</h2>
+<div class="qabox"><strong class="q">س1: عدد الاختبارات والتغطية؟</strong><br>
+94 اختباراً بتغطية ~91% على <code>app/</code> في 13 ملفاً، كل ملف يقابل دفاعاً.</div>
+<div class="qabox"><strong class="q">س2: كيف تمنع الاختبارات من مسح قاعدة الإنتاج؟</strong><br>
+اكتشفنا أن create_app يثبّت engine الإنتاج قبل أن تطبق الخصائص قاعدة الاختبار فتُهدم البيانات. الإصلاح الجذري: دمج الإعدادات قبل الإنشاء + dispose للـ engine قبل حذف الملف + <strong>اختبار حارس</strong> يمنع العودة. قاعدة العرض تحتفظ بحساباتها بعد كل تشغيل.</div>
+<div class="qabox"><strong class="q">س3: ماذا يسجّل سجل التدقيق؟</strong><br>
+أكثر من 15 نوعاً: LOGIN_SUCCESS/FAILED/BLOCKED_LOCKED/FAILED_UNKNOWN · TOTP_* · TFA_* · PASSWORD_CHANGED/RESET · USER_CREATED · PRODUCT_* · CUSTOMER_* · SALE_CREATED · INVENTORY_ADJUSTED · UPLOAD_ATTACHMENT · LOGOUT — مع user_id وip والوقت، ويعرضها admin فقط.</div>
+<div class="qabox"><strong class="q">س4: ماذا يفعل CI عند كل push؟</strong><br>
+test-and-lint (Python 3.11/3.12): ruff ثم pytest بمتغيرات آمنة؛ وsecurity-scan: bandit على app + grep لأسرار مخزنة. Fail = لا يُدمج الفرع.</div>
+<div class="qabox"><strong class="q">س5: كيف ينتشر المشروع؟</strong><br>
+Waitress (WSGI إنتاجي) عبر serve.py بعد seed وmigrate وبوضع SESSION_COOKIE_SECURE; أو docker compose بمستخدم غير جذر ومجلدات بيانات وhealthcheck.</div>
+<div class="qabox"><strong class="q">س6: ماذا وجد bandit؟</strong><br>
+0 issues. يفحص مفاتيح ثابتة وأرقاماً عشوائية غير آمنة وتنفيذ أوامر وتسريبات — ومدقق واحد ليس غاية بل يكملنا باختبارات ومراجعة.</div>
+<div class="qabox"><strong class="q">س7: كيف تقيس جودة حقيقية لا رقماً شكلياً؟</strong><br>
+أراقب تغطية الملفات الحرجة (auth/security/sales) في التقرير لا المتوسط العام، وكل اختبار مأخوذ من سيناريو هجوم/دفاع.</div>
+<div class="qabox"><strong class="q">س8: ارتباطك بالفريق؟</strong><br>
+التدقيق يستقبل أحداث زملائي، و2FA يكمل طبقة المصادقة عند زميل 1، واختباراتي الموزعة تثبت ادعاءات الثلاثة — أنا سند الأدلة.</div>
+
+<h2>6) افتتاحيتك (30 ثانية)</h2>
+<p>دوري أن أضمن أن كل ما صرّح به زملائي ليس ادّعاءً بل وراءه برهان: 94 اختباراً أوتوماتيكياً بتغطية 91%، وBandit بلا ثغرة واحدة، وقاعدة إنتاج محمية باختبار حارس حتى من أنفسنا. سجل تدقيق شامل يوثّق كل حدث ويعرضه الأدمن، والنشر باحتراف عبر Waitress وDocker وCI يفحص كل push. أرقامي المقدسة: 94 · 91 · 0.</p>
+
+<h2>7) قواعد ذهبية</h2>
+<ul>
+<li>الأرقام الأربعة التي لا تخطئ: <strong>94 · 91% · 0 · 13 ملفاً</strong>.</li>
+<li>احكِ قصة الحارس كنضج تقني: اكتشاف ← إصلاح جذري ← منع العودة.</li>
+<li>سؤال تدقيق: 15+ نوعاً، حقول user/ip/time، يشاهده admin.</li>
+<li>لا تقل "الاختبارات صحيحة" — قل "نمذجة دفاعية من سيناريوهات هجوم/دفاع".</li>
+</ul>
+
+<footer>ملف الطالب 4 · SecureStock · مسؤوليات فريق من 4 · مراجعة 2026</footer>
+</body>
+</html>

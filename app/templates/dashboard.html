@@ -1,30 +1,28 @@
 {% extends "base.html" %}
 {% block title %}Dashboard — SecureStock{% endblock %}
 {% block content %}
-<div class="row g-4">
-  <div class="col-12">
-    <div class="d-flex justify-content-between align-items-center">
-      <h1 class="h3 mb-0">Dashboard</h1>
-      <span class="text-muted small">You are logged in as <strong>{{ current_user.role }}</strong></span>
-    </div>
+<div class="ss-page-head">
+  <div>
+    <h1 class="ss-page-title"><span class="ss-title-icon"><i class="bi bi-speedometer2"></i></span>Dashboard</h1>
+    <p class="ss-page-sub">You are signed in as <strong>{{ current_user.role }}</strong> &middot; {{ current_user.email }}</p>
   </div>
+</div>
 
+<div class="row g-4">
   {% set stats = [
-    ('Products', product_count, 'box-seam', 'primary'),
-    ('Customers', customer_count, 'people', 'success'),
-    ('Sales', sale_count, 'cart-check', 'warning'),
-    ('Users', user_count, 'person-badge', 'danger')
+    ('Products', product_count, 'box-seam', 'si-products'),
+    ('Customers', customer_count, 'people', 'si-customers'),
+    ('Sales', sale_count, 'receipt', 'si-sales'),
+    ('Users', user_count, 'person-badge', 'si-users')
   ] %}
-  {% for label, value, icon, color in stats %}
+  {% for label, value, icon, style in stats %}
   <div class="col-md-6 col-xl-3">
-    <div class="card shadow-card h-100">
+    <div class="card h-100">
       <div class="card-body d-flex align-items-center gap-3">
-        <div class="stat-icon bg-{{ color }} bg-opacity-10 text-{{ color }}">
-          <i class="bi bi-{{ icon }} fs-4"></i>
-        </div>
+        <div class="stat-icon {{ style }}"><i class="bi bi-{{ icon }}"></i></div>
         <div>
-          <div class="text-muted small">{{ label }}</div>
-          <div class="fs-3 fw-bold">{{ value }}</div>
+          <div class="ss-stat-label">{{ label }}</div>
+          <div class="ss-stat-value">{{ value }}</div>
         </div>
       </div>
     </div>
@@ -34,11 +32,12 @@
 
 <div class="row g-4 mt-1">
   <div class="col-lg-7">
-    <div class="card shadow-card h-100">
-      <div class="card-header bg-white fw-semibold">Low Stock Alerts</div>
-      <div class="card-body">
+    <div class="card h-100">
+      <div class="card-header d-flex align-items-center gap-2"><i class="bi bi-exclamation-triangle text-warning"></i>Low Stock Alerts</div>
+      <div class="card-body p-0">
         {% if low_stock %}
-        <table class="table table-sm align-middle mb-0">
+        <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
           <thead><tr><th>Product</th><th>In stock</th><th>Threshold</th><th>Status</th></tr></thead>
           <tbody>
           {% for p in low_stock %}
@@ -50,28 +49,29 @@
                 {% if p.quantity == 0 %}
                   <span class="badge bg-danger">Out of stock</span>
                 {% else %}
-                  <span class="badge bg-warning text-dark">Low</span>
+                  <span class="badge bg-warning">Low</span>
                 {% endif %}
               </td>
             </tr>
           {% endfor %}
           </tbody>
         </table>
+        </div>
         {% else %}
-          <p class="text-success mb-0"><i class="bi bi-check-circle"></i> All products are above their low-stock thresholds.</p>
+          <p class="text-success m-3 mb-0"><i class="bi bi-check-circle me-1"></i>All products are above their low-stock thresholds.</p>
         {% endif %}
       </div>
     </div>
   </div>
 
   <div class="col-lg-5">
-    <div class="card shadow-card h-100">
-      <div class="card-header bg-white fw-semibold">Recent Security Activity</div>
+    <div class="card h-100">
+      <div class="card-header d-flex align-items-center gap-2"><i class="bi bi-shield-check text-primary"></i>Recent Security Activity</div>
       <div class="card-body p-0">
         {% if recent_logs %}
         <ul class="list-group list-group-flush">
           {% for log in recent_logs %}
-          <li class="list-group-item d-flex justify-content-between align-items-start">
+          <li class="list-group-item d-flex justify-content-between align-items-start border-0 border-bottom">
             <div>
               <span class="badge bg-secondary">{{ log.action }}</span>
               <div class="small text-muted mt-1">

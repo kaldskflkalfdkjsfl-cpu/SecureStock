@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>الطالب الثالث — العمليات التجارية والبيانات الحساسة · SecureStock</title>
+<style>
+:root{--accent:#0f4c81;--accent2:#e8f0fa;--border:#cdd8e4;--muted:#5b6b7c}
+*{box-sizing:border-box}
+body{font-family:"Segoe UI",Tahoma,Arial,sans-serif;color:#22303c;background:#fff;margin:0 auto;max-width:960px;padding:24px 28px 60px;line-height:1.85}
+h1,h2,h3{color:var(--accent);line-height:1.5}
+h1{font-size:1.6em;margin:8px 0 6px}
+h2{border-bottom:2px solid var(--accent2);padding-bottom:6px;margin-top:32px;font-size:1.22em}
+h3{font-size:1.02em;margin-top:18px}
+header.card{background:var(--accent);color:#fff;border-radius:10px;padding:16px 22px}
+header.card h1{color:#fff;margin-top:0}
+.idbox{background:#fff;color:#22303c;border-radius:8px;padding:8px 14px;margin-top:10px;font-size:.95em}
+table{border-collapse:collapse;width:100%;margin:10px 0;font-size:.93em}
+th,td{border:1px solid var(--border);padding:7px 9px;text-align:right;vertical-align:top}
+th{background:var(--accent);color:#fff;font-weight:600}
+tr:nth-child(even) td{background:#f7fafc}
+code{font-family:Consolas,"Cascadia Mono",monospace;background:#eef3f8;border-radius:4px;padding:1px 5px;font-size:.87em;direction:ltr;display:inline-block}
+.qabox{border-right:4px solid var(--accent);background:#f3f8fd;padding:10px 14px;margin:9px 0;border-radius:6px}
+.qabox strong.q{color:var(--accent)}
+.must{background:#fff8e6;border:1px solid #f0dda0;border-radius:8px;padding:10px 14px}
+footer{margin-top:40px;border-top:1px solid var(--border);padding-top:12px;color:var(--muted);font-size:.86em}
+@media print{body{max-width:100%;padding:0}h2{break-after:avoid}table{break-inside:avoid}}
+</style>
+</head>
+<body>
+<header class="card">
+<h1>الطالب الثالث — العمليات التجارية والبيانات الحساسة</h1>
+<div>نطاق التخصص: Sales, Inventory &amp; Sensitive Data · نظام SecureStock</div>
+<div class="idbox">الاسم: ______________ &nbsp;|&nbsp; الرقم الجامعي: ______________ &nbsp;|&nbsp; القسم: ______________</div>
+</header>
+
+<h2>1) بطاقة المسؤولية</h2>
+<table>
+<tr><th>العنصر</th><th>التفاصيل</th></tr>
+<tr><td>النطاق</td><td>المبيعات (معاملات ذرّية)، المخزون، العملاء، تشفير البيانات الحساسة، المرفوعات</td></tr>
+<tr><td>الملفات</td><td><code>app/routes/sales.py</code> · <code>app/routes/inventory.py</code> · <code>app/routes/customers.py</code> · نماذج Sales/Customer · جزء التشفير والمرفوعات</td></tr>
+<tr><td>الجملة الافتتاحية</td><td>معاملات بيع ذرّية، لا مخزون سالب، بيانات عملاء مشفّرة، مرفوعات آمنة</td></tr>
+</table>
+
+<h2>2) ما يخصك من الكود بالتفصيل</h2>
+
+<h3>2.1 <code>app/routes/sales.py</code> — المبيعات (أهم ملف)</h3>
+<table>
+<tr><th>ما أنجز</th><th>الموقع</th></tr>
+<tr><td>قائمة مبيعات: الموظف يرى ملكه فقط (IDOR)</td><td><code>sales.py:26-34</code></td></tr>
+<tr><td>المعاملة الذرّية: فحص ← Sale ← flush ← SaleItem ← خصم ← commit</td><td><code>sales.py:62-84</code> (فحص المخزون <code>:58-60</code>)</td></tr>
+<tr><td>rollback كامل عند الاستثناء</td><td><code>sales.py:87-89</code></td></tr>
+<tr><td>تفاصيل بيع محمية (أجنبي=403)</td><td><code>sales.py:93-105</code></td></tr>
+<tr><td>رفع مرفق آمن + UPLOAD_ATTACHMENT</td><td><code>sales.py:107-130</code></td></tr>
+<tr><td>تحميل مرفق بمسار مُتحقق</td><td><code>sales.py:132-143</code></td></tr>
+</table>
+
+<h3>2.2 <code>app/routes/inventory.py</code> — المخزون</h3>
+<table>
+<tr><th>ما أنجز</th><th>الموقع</th></tr>
+<tr><td>بحث بتهريب LIKE</td><td><code>inventory.py:16-17</code></td></tr>
+<tr><td>تعديل محروس + منع المخزون السالب + تدقيق</td><td><code>inventory.py:25-45</code> (الفحص <code>:37-39</code>)</td></tr>
+</table>
+
+<h3>2.3 <code>app/routes/customers.py</code> — العملاء</h3>
+<table>
+<tr><th>ما أنجز</th><th>الموقع</th></tr>
+<tr><td>إنشاء: تشفير الهاتف + تعقيم + تدقيق</td><td><code>customers.py:22-44</code> (<code>:31-34</code>)</td></tr>
+<tr><td>تعديل: إعادة تشفير + تدقيق</td><td><code>customers.py:46-67</code> (<code>:57-60</code>)</td></tr>
+<tr><td>حذف محمي (IntegrityError)</td><td><code>customers.py:69-83</code></td></tr>
+</table>
+
+<h3>2.4 النماذج والأدوات</h3>
+<table>
+<tr><th>المجال</th><th>الدليل</th></tr>
+<tr><td>Customer: `phone_encrypted` + قراءة بفك التشفير</td><td><code>models.py:42-51</code></td></tr>
+<tr><td>Sale / SaleItem / Product بالعلاقات</td><td><code>models.py:52-71</code></td></tr>
+<tr><td>Fernet تشفير/فك مع `[unavailable]` آمن</td><td><code>security.py:46-63</code></td></tr>
+<tr><td>فحص المرفوعات (امتدادات + بايتات سحرية + مسار)</td><td><code>security.py:18-24,83-110</code></td></tr>
+</table>
+
+<h2>3) ما يخصك من الوثائق</h2>
+<table>
+<tr><th>الوثيقة</th><th>الأقسام</th></tr>
+<tr><td><code>docs/DELIVERABLE.md</code></td><td>§2.1 (A2/A3/A4) · §3.2 (SUC3/SUC4) · §5.3 (Fernet) · §8 (ERD) · PF-3</td></tr>
+<tr><td><code>docs/ERD.md</code></td><td>الملف بأكمله</td></tr>
+<tr><td><code>docs/COMPLIANCE_MATRIX_AR.md</code></td><td>P2-7 · P2-1 (IDOR والمرفوعات) · PF-2 · PF-3</td></tr>
+</table>
+
+<div class="must"><strong>نقاط قوتك — تعرفها إجبارياً:</strong>
+1) البيع إما كامل أو لا شيء (Commit/Rollback) · 2) لا مخزون سالب (فحصان) ·
+3) الهاتف Fernet = AES-128-CBC + HMAC-SHA256 خطأ ← لا يقرأ فاسداً أبداً ·
+4) IDOR: الموظف بحصر مبيعاته · 5) 4 طبقات لفحص المرفق · 6) علاقة 3 جداول · 7) حذف لا يكسر المراجع.</div>
+
+<h2>4) العرض الحي أمام الدكتور</h2>
+<ol>
+<li>إنشاء عميل بهاتف → أرِ هاتفه مشفّراً في قاعدة البيانات <code>gAAAAA</code>...</li>
+<li>إنشاء بيع → انخفضت كمية المنتج + SALE_CREATED.</li>
+<li>بيع بكمية أكبر من المخزون → رفض بلا خصم.</li>
+<li>من حساب employee أجنبي فتح البيع → 403.</li>
+<li>رفع <code>fake.png</code> محتواه ليس PNG → رفض بالبايتات السحرية.</li>
+</ol>
+
+<h2>5) أسئلة المناقشة المتوقعة</h2>
+<div class="qabox"><strong class="q">س1: كيف تضمن ذرّية البيع؟</strong><br>
+session واحد: فحص مخزون ← Sale ← flush (استخراج id) ← SaleItem ← خصم الكمية ← commit وحيد؛ أي استثناء = rollback. <code>sales.py:62-89</code> + test_sales.</div>
+<div class="qabox"><strong class="q">س2: كميتها تفوق المخزون؟</strong><br>
+رفض قبل تنفيذ المعاملة: <code>quantity &gt; product.quantity</code> → رسالة Insufficient stock. <code>sales.py:57-60</code>.</div>
+<div class="qabox"><strong class="q">س3: لماذا تشفّر الهاتف وكيف؟</strong><br>
+PII حساس؛ تسريب القاعدة بلا قنّونة فائدة. Fernet = AES-128-CBC + HMAC-SHA256 (Encrypt-then-MAC) — أي تلاعب يفشل فكّ التشفير فنعرض unavailable. المفتاح في البيئة. <code>security.py:46-63</code>.</div>
+<div class="qabox"><strong class="q">س4: أين توقف IDOR؟</strong><br>
+القائمة مصفاة بملكية الموظف <code>:27-28</code>، الفتح الأجنبي 403 <code>:100-102</code>، ونفس الفحص للمرفق <code>:114-115</code>.</div>
+<div class="qabox"><strong class="q">س5: طبقات فحص المرفوعات؟</strong><br>
+امتداد أبيض ← بايتات سحرية (أول 16 بايت: %PDF / PNG / JPEG) ← secure_filename ← مسار محلَّل داخل المجلد ← حد 2MB. <code>security.py:18-24,77-110</code>.</div>
+<div class="qabox"><strong class="q">س6: منع المخزون السالب في التعديل؟</strong><br>
+فحص <code>amount &lt; -product.quantity</code> قبل التطبيق. <code>inventory.py:37-39</code>.</div>
+<div class="qabox"><strong class="q">س7: العلاقات؟</strong><br>
+User 1:N Sale · Customer 1:N Sale · Sale 1:N SaleItem N:1 Product عبر ForeignKey + relationship في models.py.</div>
+<div class="qabox"><strong class="q">س8: حذف عميل له مبيعات؟</strong><br>
+IntegrityError ← rollback + رسالة واضحة — نزاهة المراجع محفوظة. <code>customers.py:76-82</code>.</div>
+<div class="qabox"><strong class="q">س9: حماية البحث من SQLi؟</strong><br>
+ORM معاملية بلا نص SQL؛ وتهريب % و_ و\ في LIKE. <code>inventory.py:16-17</code>.</div>
+<div class="qabox"><strong class="q">س10: فائدة flush في البيع؟</strong><br>
+يرسل الإدراج ويستخرج <code>sale.id</code> لبناء SaleItem دون تثبيت نهائي؛ ثم commit واحد أو rollback كامل.</div>
+
+<h2>6) افتتاحيتك (30 ثانية)</h2>
+<p>نطاقي هو عمل النظام يومياً: كل بيع ينفّذ كمعاملة ذرّية تفحص المخزون وتنشئ البيع وسطوره وتخصم الكمية في عملية واحدة، فلا مخزون سالب ولا صفقة ناقصة. والعملاء محميون بتشفير رقم الهاتف بـ Fernet بنمط Encrypt-then-MAC، ومكافحة IDOR بحصر كل موظف في مبيعاته، ومرفوعات تمر بفحص البايتات السحرية والمسارات الآمنة.</p>
+
+<h2>7) قواعد ذهبية</h2>
+<ul>
+<li>الكلمة المفتاحية: المعاملة الذرّية — اربطها بـ commit/rollback دائماً.</li>
+<li>"لا بيع بلا خصم مخزون، ولا خصم بلا بيع."</li>
+<li>الأرقام: 4 طبقات للمرفق، 2 فحص للمخزون، شجاعة الصفقة.</li>
+<li>فرّق بوضوح بين تجزئة كلمات المرور (لا تُفك) وتشفير الهاتف (يُفك لمن يملك المفتاح).</li>
+</ul>
+
+<footer>ملف الطالب 3 · SecureStock · مسؤوليات فريق من 4 · مراجعة 2026</footer>
+</body>
+</html>

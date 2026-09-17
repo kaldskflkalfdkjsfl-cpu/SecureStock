@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>الطالب الثاني — التفويض وإدارة المستخدمين · SecureStock</title>
+<style>
+:root{--accent:#0f4c81;--accent2:#e8f0fa;--border:#cdd8e4;--muted:#5b6b7c}
+*{box-sizing:border-box}
+body{font-family:"Segoe UI",Tahoma,Arial,sans-serif;color:#22303c;background:#fff;margin:0 auto;max-width:960px;padding:24px 28px 60px;line-height:1.85}
+h1,h2,h3{color:var(--accent);line-height:1.5}
+h1{font-size:1.6em;margin:8px 0 6px}
+h2{border-bottom:2px solid var(--accent2);padding-bottom:6px;margin-top:32px;font-size:1.22em}
+h3{font-size:1.02em;margin-top:18px}
+header.card{background:var(--accent);color:#fff;border-radius:10px;padding:16px 22px}
+header.card h1{color:#fff;margin-top:0}
+.idbox{background:#fff;color:#22303c;border-radius:8px;padding:8px 14px;margin-top:10px;font-size:.95em}
+table{border-collapse:collapse;width:100%;margin:10px 0;font-size:.93em}
+th,td{border:1px solid var(--border);padding:7px 9px;text-align:right;vertical-align:top}
+th{background:var(--accent);color:#fff;font-weight:600}
+tr:nth-child(even) td{background:#f7fafc}
+code{font-family:Consolas,"Cascadia Mono",monospace;background:#eef3f8;border-radius:4px;padding:1px 5px;font-size:.87em;direction:ltr;display:inline-block}
+.qabox{border-right:4px solid var(--accent);background:#f3f8fd;padding:10px 14px;margin:9px 0;border-radius:6px}
+.qabox strong.q{color:var(--accent)}
+.must{background:#fff8e6;border:1px solid #f0dda0;border-radius:8px;padding:10px 14px}
+footer{margin-top:40px;border-top:1px solid var(--border);padding-top:12px;color:var(--muted);font-size:.86em}
+@media print{body{max-width:100%;padding:0}h2{break-after:avoid}table{break-inside:avoid}}
+</style>
+</head>
+<body>
+<header class="card">
+<h1>الطالب الثاني — التفويض وإدارة المستخدمين</h1>
+<div>نطاق التخصص: RBAC &amp; User Management · نظام SecureStock</div>
+<div class="idbox">الاسم: ______________ &nbsp;|&nbsp; الرقم الجامعي: ______________ &nbsp;|&nbsp; القسم: ______________</div>
+</header>
+
+<h2>1) بطاقة المسؤولية</h2>
+<table>
+<tr><th>العنصر</th><th>التفاصيل</th></tr>
+<tr><td>النطاق</td><td>التحكم بالوصول (RBAC) وإدارة المستخدمين والمنتجات</td></tr>
+<tr><td>الملفات</td><td><code>app/routes/users.py</code> · <code>app/routes/products.py</code> · <code>app/models.py</code> (User, Product) · زخرفة <code>role_required</code> · نماذج <code>UserForm</code> و<code>ProductForm</code></td></tr>
+<tr><td>الجملة الافتتاحية</td><td>مسؤول عن التفويض: أدوار RBAC تُفرض من الخادم على كل مسار، وإدارة آمنة للمستخدمين والمنتجات</td></tr>
+</table>
+
+<h2>2) ما يخصك من الكود بالتفصيل</h2>
+
+<h3>2.1 <code>app/routes/users.py</code> — إدارة المستخدمين (admin فقط)</h3>
+<table>
+<tr><th>ما أنجز</th><th>الموقع</th></tr>
+<tr><td>قائمة مستخدمين بترقيم (admin فقط)</td><td><code>users.py:18-27</code> (الزخرفة <code>:20</code>)</td></tr>
+<tr><td>إنشاء: فحص بريد مكرر + سياسة كلمة مرور + تجزئة scrypt</td><td><code>users.py:29-61</code> (<code>:36</code>، <code>:40-45</code>، <code>:51</code>)</td></tr>
+<tr><td>حذف محمي: منع حذف النفس + حماية IntegrityError</td><td><code>users.py:63-80</code> (<code>:70-72</code>، <code>:73-79</code>)</td></tr>
+<tr><td>إعادة تعيين + كسر القفل + تدقيق PASSWORD_RESET</td><td><code>users.py:82-115</code> (<code>:104-105</code>، <code>:109-111</code>)</td></tr>
+<tr><td>اسم المستخدم مُعقم بـ sanitize_text</td><td><code>users.py:48</code></td></tr>
+</table>
+
+<h3>2.2 <code>app/routes/products.py</code> — إدارة المنتجات (admin/manager)</h3>
+<table>
+<tr><th>ما أنجز</th><th>الموقع</th></tr>
+<tr><td>قائمة بحث بتهريب LIKE</td><td><code>products.py:11-24</code> (<code>:17-18</code>)</td></tr>
+<tr><td>إنشاء/تعديل/حذف مع role_required وتدقيق وتعقيم</td><td><code>products.py:26-80</code></td></tr>
+</table>
+
+<h3>2.3 <code>app/models.py</code> + <code>app/security.py</code> + <code>app/forms.py</code></h3>
+<table>
+<tr><th>المجال</th><th>الدليل</th></tr>
+<tr><td>نموذج User (email + role + failed_attempts + locked_until)</td><td><code>models.py:9-18</code></td></tr>
+<tr><td>نموذج Product (quantity + low_stock_threshold)</td><td><code>models.py:32-39</code></td></tr>
+<tr><td>زخرفة <code>role_required</code>: فحص is_authenticated + الدور وإلا 403</td><td><code>security.py:122-132</code></td></tr>
+<tr><td>UserForm / ProductForm / ResetPasswordForm</td><td><code>forms.py:20-43</code> و<code>:92-99</code></td></tr>
+</table>
+
+<h2>3) ما يخصك من الوثائق</h2>
+<table>
+<tr><th>الوثيقة</th><th>الأقسام</th></tr>
+<tr><td><code>docs/DELIVERABLE.md</code></td><td>§2.3 (SR2) · §3.1 · §6 · §7 (مصفوفة RBAC)</td></tr>
+<tr><td><code>docs/roles.md</code></td><td>المملف بأكمله</td></tr>
+<tr><td><code>docs/COMPLIANCE_MATRIX_AR.md</code></td><td>P2-1 (SQLi بحث المنتجات) · P2-2 · PF-1 · PF-5</td></tr>
+</table>
+
+<div class="must"><strong>نقاط قوتك — تعرفها إجبارياً:</strong>
+1) RBAC بأدوار three: admin/manager/employee · 2) role_required على الخادم لا الواجهة ·
+3) حذف محمي (لا نفسك، لا صاحب مبيعات) · 4) سياسة كلمة مرور تُفرض عند الإنشاء وإعادة التعيين ·
+5) كل كلمة مرور scrypt لا نص صريح أبداً · 6) كل عملية مسجلة · 7) 12 اختباراً RBAC تثبت الزخارف.</div>
+
+<h2>4) العرض الحي أمام الدكتور</h2>
+<ol>
+<li>.admin ← إنشاء مستخدم manager → نجاح + USER_CREATED في التدقيق.</li>
+<li>دخول employee ← فتح <code>/users</code> → <strong>403</strong>.</li>
+<li>من employee ← تعديل منتج → <strong>403</strong>.</li>
+<li>عد لأدمن ← إعادة تعيين كلمة مرور لمستخدم → PASSWORD_RESET + كسر القفل.</li>
+</ol>
+
+<h2>5) أسئلة المناقشة المتوقعة</h2>
+<div class="qabox"><strong class="q">س1: اشرح RBAC.</strong><br>
+three أدوار: admin (المستخدمون + التدقيق + الكل) · manager (منتجات/عملاء/مخزون/مبيعات) · employee (قراءة منتجات + مبيعاته فقط). يُفرض بديكور على الخادم.</div>
+<div class="qabox"><strong class="q">س2: ماذا لو فتح موظف /users في الرابط؟</strong><br>
+403 فوراً — الديكور يفحص قبل التنفيذ في الخادم، لا اعتماد على الواجهة. <code>users.py:14</code>.</div>
+<div class="qabox"><strong class="q">س3: كيف تضمن تغطية الزخرفة لكل مسار؟</strong><br>
+12 اختباراً في test_rbac تسجل بثلاث أدوار وتفحص 200/403 — أي نسيان يظهر فوراً.</div>
+<div class="qabox"><strong class="q">س4: سياسة كلمة المرور؟</strong><br>
+10–128 حرفاً + كبير + صغير + رقم + رمز في <code>security.py:40-44</code>، تُفرض عند الإنشاء <code>users.py:40-45</code> وإعادة التعيين <code>:95-100</code>.</div>
+<div class="qabox"><strong class="q">س5: إعادة التعيين وكسر القفل؟</strong><br>
+admin فقط، يستبدل التجزئة + يصفّر failed_attempts + يحذف locked_until → عودة صاحب الحساب. <code>users.py:102-105</code>.</div>
+<div class="qabox"><strong class="q">س6: لماذا لا يحذف المدير نفسه؟</strong><br>
+لمنع ترك النظام بلا مدير فعلي. حماية تفويضية قبل التنفيذ: <code>users.py:70-72</code>.</div>
+<div class="qabox"><strong class="q">س7: حماية حذف مستخدم له مبيعات؟</strong><br>
+IntegrityError من Foreign Key → rollback + رسالة واضحة. <code>users.py:73-79</code>.</div>
+<div class="qabox"><strong class="q">س8: هل يمكن أن يتخطى الموظف صلاحيات التعديل؟</strong><br>
+لا — التفرقة ليست في الواجهة بل في الخادم: القراءة مفتوحة للكل، لكن الكتابة محصورة في admin/manager عبر <code>role_required</code> الذي يفحص الدور قبل أي تنفيذ. حتى لو غيّر الموظف HTML لا يتغير قرار الخادم.</div>
+<div class="qabox"><strong class="q">س9: CRUD للمنتجات كاملاً؟</strong><br>
+إنشاء <code>:26-47</code>، قراءة+بحث <code>:11-24</code>، تعديل <code>:49-69</code>، حذف <code>:71-80</code> — مع تعقيم وتدقيق.</div>
+<div class="qabox"><strong class="q">س10: خطوات إنشاء مستخدم آمنة؟</strong><br>
+فحص النموذج ← بريد فريد ← سياسة كلمة مرور ← hash_password (scrypt) ← USER_CREATED. <code>users.py:33-58</code>.</div>
+
+<h2>6) افتتاحيتك (30 ثانية)</h2>
+<p>نطاقي هو من يدخل النظام وماذا يجوز له: RBAC بثلاثة أدوار تُفرض بالخادم عبر زخرفة role_required على كل مسار. إدارة المستخدمين آمنة: إنشاء بتجزئة scrypt وبريد فريد، حذف محمي لا يمس النفس ولا أصحاب المبيعات، وإعادة تعيين تكسر القفل — مع CRUD كامل للمنتجات وسياسة كلمة مرور صارمة وتدقيق لكل عملية.</p>
+
+<footer>ملف الطالب 2 · SecureStock · مسؤوليات فريق من 4 · مراجعة 2026</footer>
+</body>
+</html>

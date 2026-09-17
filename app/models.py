@@ -15,6 +15,7 @@ class User(UserMixin, db.Model):
     failed_attempts = db.Column(db.Integer, nullable=False, default=0)
     locked_until = db.Column(db.DateTime(timezone=True), nullable=True)
     totp_secret = db.Column(db.String(64), nullable=True)
+    session_token = db.Column(db.String(64), nullable=True)
     created_at = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(UTC))
 
     @property

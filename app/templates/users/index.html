@@ -2,31 +2,39 @@
 {% from "_pagination.html" import render_pagination %}
 {% block title %}Users — SecureStock{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center">
-<h1 class="h3">Users</h1><a class="btn btn-primary" href="{{ url_for('users.create') }}">+ Create User</a>
+<div class="ss-page-head">
+  <div>
+    <h1 class="ss-page-title"><span class="ss-title-icon"><i class="bi bi-person-badge"></i></span>Users</h1>
+    <p class="ss-page-sub">Accounts, roles and lockout status</p>
+  </div>
+  <a class="btn btn-primary" href="{{ url_for('users.create') }}"><i class="bi bi-person-plus me-1"></i>Create User</a>
 </div>
-<div class="table-responsive mt-3">
-<table class="table table-striped bg-white shadow-card align-middle">
-<thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Action</th></tr></thead>
+
+<div class="ss-table-wrap">
+<div class="table-responsive">
+<table class="table table-hover align-middle">
+<thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th class="text-end">Action</th></tr></thead>
 <tbody>
 {% for u in users.items %}
-<tr><td>{{ u.id }}</td><td>{{ u.name }}</td><td>{{ u.email }}</td><td><span class="badge bg-secondary">{{ u.role }}</span></td>
+<tr><td class="text-muted">#{{ u.id }}</td><td class="fw-semibold">{{ u.name }}</td><td>{{ u.email }}</td>
+<td><span class="badge bg-{{ 'success' if u.role == 'admin' else ('info' if u.role == 'manager' else 'secondary') }}">{{ u.role }}</span></td>
 <td>
-{% if u.is_locked() %}<span class="badge bg-danger">Locked</span>
-{% else %}<span class="badge bg-success">Active</span>{% endif %}
+{% if u.is_locked() %}<span class="badge bg-danger"><i class="bi bi-lock-fill me-1"></i>Locked</span>
+{% else %}<span class="badge bg-success"><i class="bi bi-check-circle-fill me-1"></i>Active</span>{% endif %}
 </td>
-<td>
+<td class="text-end">
 {% if u.id != current_user.id %}
-<a class="btn btn-sm btn-outline-primary" href="{{ url_for('users.reset_password', user_id=u.id) }}">Reset password</a>
-<form method="post" action="{{ url_for('users.delete', user_id=u.id) }}" class="d-inline">
+<a class="btn btn-sm btn-outline-primary" href="{{ url_for('users.reset_password', user_id=u.id) }}"><i class="bi bi-key me-1"></i>Reset password</a>
+<form method="post" action="{{ url_for('users.delete', user_id=u.id) }}" class="d-inline" data-confirm="Delete user?">
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-<button class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete user?')">Delete</button>
+<button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
 </form>
-{% else %}<span class="text-muted small">You</span>{% endif %}
+{% else %}<span class="text-muted small"><i class="bi bi-person-check me-1"></i>You</span>{% endif %}
 </td></tr>
 {% endfor %}
 </tbody>
 </table>
+</div>
 </div>
 {{ render_pagination(users, 'users.index') }}
 {% endblock %}

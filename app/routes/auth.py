@@ -6,7 +6,7 @@ from flask_login import current_user, login_user, logout_user
 from ..extensions import db, limiter
 from ..forms import LoginForm, TotpForm
 from ..models import AuditLog, User
-from ..security import verify_password, verify_totp_code
+from ..security import bind_session, verify_password, verify_totp_code
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -65,6 +65,8 @@ def login():
 
             session.clear()
             login_user(user, remember=False, fresh=True)
+            bind_session(user)
+            db.session.commit()
             session.permanent = True
             return redirect(url_for("dashboard.index"))
 
@@ -112,6 +114,8 @@ def verify_2fa():
             db.session.commit()
             session.clear()
             login_user(user, remember=False, fresh=True)
+            bind_session(user)
+            db.session.commit()
             session.permanent = True
             return redirect(url_for("dashboard.index"))
 

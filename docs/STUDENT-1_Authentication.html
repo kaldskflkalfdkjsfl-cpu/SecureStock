@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>الطالب الأول — الهوية والمصادقة · SecureStock</title>
+<style>
+:root{--accent:#0f4c81;--accent2:#e8f0fa;--border:#cdd8e4;--muted:#5b6b7c}
+*{box-sizing:border-box}
+body{font-family:"Segoe UI",Tahoma,Arial,sans-serif;color:#22303c;background:#fff;margin:0 auto;max-width:960px;padding:24px 28px 60px;line-height:1.85}
+h1,h2,h3{color:var(--accent);line-height:1.5}
+h1{font-size:1.6em;margin:8px 0 6px}
+h2{border-bottom:2px solid var(--accent2);padding-bottom:6px;margin-top:32px;font-size:1.22em}
+h3{font-size:1.02em;margin-top:18px}
+header.card{background:var(--accent);color:#fff;border-radius:10px;padding:16px 22px}
+header.card h1{color:#fff;margin-top:0}
+.idbox{background:#fff;color:#22303c;border-radius:8px;padding:8px 14px;margin-top:10px;font-size:.95em}
+table{border-collapse:collapse;width:100%;margin:10px 0;font-size:.93em}
+th,td{border:1px solid var(--border);padding:7px 9px;text-align:right;vertical-align:top}
+th{background:var(--accent);color:#fff;font-weight:600}
+tr:nth-child(even) td{background:#f7fafc}
+code{font-family:Consolas,"Cascadia Mono",monospace;background:#eef3f8;border-radius:4px;padding:1px 5px;font-size:.87em;direction:ltr;display:inline-block}
+.qabox{border-right:4px solid var(--accent);background:#f3f8fd;padding:10px 14px;margin:9px 0;border-radius:6px}
+.qabox strong.q{color:var(--accent)}
+.must{background:#fff8e6;border:1px solid #f0dda0;border-radius:8px;padding:10px 14px}
+footer{margin-top:40px;border-top:1px solid var(--border);padding-top:12px;color:var(--muted);font-size:.86em}
+@media print{body{max-width:100%;padding:0}h2{break-after:avoid}table{break-inside:avoid}}
+</style>
+</head>
+<body>
+
+<header class="card">
+<h1>الطالب الأول — الهوية والمصادقة</h1>
+<div>نطاق التخصص: Authentication &amp; Session Security · نظام SecureStock</div>
+<div class="idbox">الاسم: ______________ &nbsp;|&nbsp; الرقم الجامعي: ______________ &nbsp;|&nbsp; القسم: ______________</div>
+</header>
+
+<h2>1) بطاقة المسؤولية</h2>
+<table>
+<tr><th>العنصر</th><th>التفاصيل</th></tr>
+<tr><td>النطاق</td><td>الهوية والمصادقة وجلسات الأمان</td></tr>
+<tr><td>الملفات</td><td><code>app/routes/auth.py</code> · <code>app/security.py</code> · <code>config.py</code> (جلسة) · <code>app/security_headers.py</code> · معالجات الأخطاء في <code>app/__init__.py</code></td></tr>
+<tr><td>ما يقوله للدكتور</td><td>مسؤول عن هوية النظام: مصادقة قوية، قفل، مصادقة ثنائية، جلسات آمنة</td></tr>
+</table>
+
+<h2>2) ما يخصك من الكود بالتفصيل</h2>
+
+<h3>2.1 <code>app/routes/auth.py</code> — قلب المصادقة</h3>
+<table>
+<tr><th>ما أنجز</th><th>الموقع</th></tr>
+<tr><td>منع دخول مسجّل مجدداً إلى /login</td><td><code>auth.py:27-28</code></td></tr>
+<tr><td>منع استبيان الحسابات: تحقق بزمن ثابت عبر تجزئة وهمية</td><td><code>auth.py:13-16</code> + <code>:43-48</code></td></tr>
+<tr><td>قفل الحساب بعد 3 محاولات فاشلة (15 دقيقة)</td><td><code>auth.py:73-77</code></td></tr>
+<tr><td>تدقيق LOGIN_SUCCESS/FAILED/BLOCKED_LOCKED/UNKNOWN</td><td><code>auth.py:36-39,53-55,78-85</code></td></tr>
+<tr><td>دخول بخطوتين عند تفعيل 2FA</td><td><code>auth.py:58-64</code></td></tr>
+<tr><td>تحقق TOTP + TOTP_VERIFIED/FAILED</td><td><code>auth.py:108-127</code></td></tr>
+<tr><td>خروج آمن + مسح الجلسة + LOGOUT</td><td><code>auth.py:130-139</code></td></tr>
+<tr><td>تحديد معدل الدخول 10/دقيقة (وخطوة TOTP)</td><td><code>auth.py:25</code> و<code>:93</code></td></tr>
+</table>
+
+<h3>2.2 <code>app/security.py</code> — الأدوات الأمنية</h3>
+<table>
+<tr><th>ما أنجز</th><th>الموقع</th></tr>
+<tr><td>تجزئة scrypt + التحقق</td><td><code>security.py:26-30</code></td></tr>
+<tr><td>تعقيم bleach (حذف كل الوسوم + حد طول)</td><td><code>security.py:32-35</code></td></tr>
+<tr><td>سياسة كلمة المرور (10–128 + 4 شروط)</td><td><code>security.py:40-44</code></td></tr>
+<tr><td>TOTP: توليد سر + تحقق بنافذة 1</td><td><code>security.py:113-122</code></td></tr>
+<tr><td>رابط التزويد QR</td><td><code>security.py:124-125</code></td></tr>
+<tr><td>زخرفة <code>role_required</code> (أساس التفويض)</td><td><code>security.py:122-132</code></td></tr>
+</table>
+
+<h3>2.3 النماذج والإعدادات والرؤوس والأخطاء</h3>
+<table>
+<tr><th>المجال</th><th>الدليل</th></tr>
+<tr><td>نماذج الدخول</td><td><code>LoginForm</code> <code>forms.py:15-18</code> · <code>TotpForm</code> (6 أرقام <code>^&#92;d{6}$</code>) <code>forms.py:69-78</code></td></tr>
+<tr><td>الجلسة</td><td>HttpOnly <code>config.py:17</code> · SameSite=Lax <code>:18</code> · Secure <code>:19</code> · عمر الكعكة 8 ساعات <code>:22</code> · مهلة خمول 30 دقيقة ومهلة مطلقة 8 ساعات <code>:25-26</code> · CSRF ساعة <code>:31</code></td></tr>
+<tr><td>إبطال الجلسات من الخادم</td><td>بصمة <code>User.session_token</code> <code>models.py:18</code> · ربط <code>security.py:77-92</code> · تحقق كل طلب <code>security.py:95-119</code> + <code>__init__.py:31-43</code> · تدوير عند تغيير كلمة المرور <code>profile.py:125</code> وإعادة التعيين <code>users.py:108</code> و"الخروج من كل الأجهزة" <code>profile.py:138-148</code></td></tr>
+<tr><td>رؤوس الأمان</td><td>CSP <code>security_headers.py:8-12</code> · nosniff <code>:5</code> · DENY <code>:6</code> · Referrer <code>:7</code></td></tr>
+<tr><td>معالجات الأخطاء</td><td>400 <code>:40-42</code> · 403 <code>:44-46</code> · 404 <code>:48-50</code> · 429 <code>:52-54</code> · 500 مع rollback <code>:56-59</code> في <code>app/__init__.py</code></td></tr>
+</table>
+
+<h2>3) ما يخصك من الوثائق</h2>
+<table>
+<tr><th>الوثيقة</th><th>الأقسام</th></tr>
+<tr><td><code>docs/DELIVERABLE.md</code></td><td>§1.2 (المكدس) · §2 (SRE 5/5/4) · §3.2 · §4 (STRIDE/DREAD) · §5.1–5.5 و5.7</td></tr>
+<tr><td><code>docs/security_documentation.md</code></td><td>كل ما يخص المصادقة والتشفير والجلسات</td></tr>
+<tr><td><code>docs/COMPLIANCE_MATRIX_AR.md</code></td><td>P2-1 (CSRF) · P2-3a · P2-3c · P2-3d · P2-6 · P2-7 (التجزئة)</td></tr>
+</table>
+
+<div class="must"><strong>نقاط قوتك — تعرفها إجبارياً:</strong>
+1) scrypt = دالة ذاكرة ضد GPU · 2) التجزئة الوهمية = إلغاء فرق التوقيت (لا Enumeration) ·
+3) قفل بعد 3 محاولات بـ 15 دقيقة بأوقات UTC · 4) Limiter (IP) + قفل (حساب) = طبقتان ·
+5) TOTP = HMAC-SHA1 على (الوقت/30) بنافذة 1 · 6) الجلسة HttpOnly + SameSite + Secure + 30د ·
+7) CSRF: رمز مرتبط بالجلسة بصلاحية ساعة → 400 بدونه · 8) أخطاء منسقة بلا تفاصيل + rollback.</div>
+
+<h2>4) العرض الحي أمام الدكتور</h2>
+<ol>
+<li>دخول صحيح بحساب <code>employee@securestock.example.com</code> / <code>ChangeMe123!</code> → لوحة القيادة.</li>
+<li>بعد خروج: إدخال كلمة مرور خاطئة 3 مرات → لاحظ رسالة القفل.</li>
+<li>فتح <code>/audit</code> لأدمن وفلترة <code>LOGIN_BLOCKED_LOCKED</code> → أظهر الحدث (مع زميل 4).</li>
+<li>إغراق محاولات الدخول تنازلياً → صفحة 429.</li>
+<li>تفعيل 2FA برمز QR ثم دخول بخطوتين (مع زميل 4 الذي يدير <code>profile.py</code>).</li>
+</ol>
+
+<h2>5) أسئلة المناقشة المتوقعة + إجاباتك النموذجية</h2>
+<div class="qabox"><strong class="q">س1: لماذا scrypt وليس SHA-256؟</strong><br>
+SHA-256 سريعة جداً — أي المهاجم يجرب مليارات التخمينات. scrypt تستنزف <strong>الذاكرة</strong> في كل تخمين فتثقل على CUDA/ASIC، والملح العشوائي لكل مستخدم يعطّل جداول قوس قزح.</div>
+<div class="qabox"><strong class="q">س2: كيف منعت استبيان الحسابات؟</strong><br>
+عند غياب الحساب أتحقق من <code>DUMMY_HASH</code> (تجزئة صالحة ثابتة) فيتساوى زمن الرد، ورسالة الخطأ موحدة. الدليل: <code>auth.py:45-48</code>.</div>
+<div class="qabox"><strong class="q">س3: اشرح القفل ودور المنطقة الزمنية؟</strong><br>
+العدّاد <code>failed_attempts</code>، المحاولة الثالثة تضع <code>locked_until = now()+15min</code>، وفحص <code>is_locked()</code> يطبّع إلى UTC قبل المقارنة فلا يفلت القفل بتغيير إعداد الجهاز. <code>auth.py:73-77</code> + <code>models.py:25-31</code>.</div>
+<div class="qabox"><strong class="q">س4: لماذا Limiter بجانب القفل؟</strong><br>
+القفل خاص بحساب واحد؛ المتسلل يغيّر البريد ويواصل. Limiter يحد ضغط المصدر كله (10/دقيقة) — طبقة IP + طبقة حساب.</div>
+<div class="qabox"><strong class="q">س5: كيف يعمل TOTP؟</strong><br>
+سر Base32 مشترك، الرمز = <code>Truncate(HMAC-SHA1(secret, الوقت/30))</code>، ونقبل نافذة واحدة قبله/بعده لتعويض انحراف الساعة. <code>security.py:174-179</code>.</div>
+<div class="qabox"><strong class="q">س6: ما تجهيزات الجلسة؟</strong><br>
+HttpOnly (لا JavaScript) + SameSite=Lax (لا CSRF عبر المواقع) + Secure + <code>session.clear()</code> عند كل انتقال حساس (ضد Session Fixation). وما فوق الكعكة: <strong>بصمة <code>session_token</code> قابلة للإبطال من الخادم</strong> تُفحص في كل طلب (<code>security.py:77-100</code>) + <strong>مهلة خمول 30 دقيقة ومهلة مطلقة 8 ساعات</strong> في <code>user_loader</code> (<code>__init__.py:31-43</code>). لذا تغيير كلمة المرور أو إعادة تعيينها أو "الخروج من كل الأجهزة" يقتل الجلسات القديمة فوراً. الاختبارات: <code>tests/test_session_security.py</code>.</div>
+<div class="qabox"><strong class="q">س7: كيف تصمد ضد CSRF؟</strong><br>
+كل نموذج <code>FlaskForm</code> يحمل رمزاً سرياً مرتبطاً بالجلسة يُفحص قبل POST؛ بدونه = 400، والرمز محدود بساعة. <code>config.py:31</code>.</div>
+<div class="qabox"><strong class="q">س8: ما رؤوس الأمان ولماذا؟</strong><br>
+CSP يقيّد مصادر السكربت ويحظر object/iframe · nosniff يمنع تلاعب أنواع المحتوى · DENY يمنع الإطار · Referrer يقلل التسريب. <code>security_headers.py</code>.</div>
+<div class="qabox"><strong class="q">س9: ماذا يحدث عند 500؟</strong><br>
+rollback للجلسة + صفحة أنيقة بلا أي خيط داخلي. <code>__init__.py:56-59</code>.</div>
+<div class="qabox"><strong class="q">س10: كيف تطبق قوة كلمة المرور؟</strong><br>
+`validate_password` (10–128 + كبير + صغير + رقم + رمز) + منع إعادة استخدام الحالية عبر verify_password. <code>security.py:40-44</code>.</div>
+
+<h2>6) افتتاحيتك الجاهزة (30 ثانية)</h2>
+<p>أنا مسؤول عن هوية النظام ودخوله. الحماية تبدأ من تجزئة scrypt المملحة مع تجزئة وهمية تُسوّي زمن الرد فلا يُكشف وجود الحساب، ثم قفل بعد ثلاث محاولات فاشلة، وتحديد معدل بعشرة طلبات للدقيقة، ومصادقة ثنائية TOTP بست خانات، وجلسات برؤوس أمان صارمة ومدة ثلاثين دقيقة، وكل حدث يُسجَّل في سجل التدقيق.</p>
+
+<h2>7) قواعد ذهبية خاصة بك</h2>
+<ul>
+<li>التزم الأرقام: <strong>3 محاولات، 15 دقيقة، 10/دقيقة، 30 دقيقة، 6 خانات، نافذة 1</strong>.</li>
+<li>أي "لماذا" = اربطها بالسبب (متانة/سرعة/طبقات) لا حفظ الجملة.</li>
+<li>لا تخلط قفل الحساب (حساب) مع تحديد المعدل (عنوان IP).</li>
+<li>جهّز لتفسير <code>DUMMY_HASH</code> كلمةً كلمةً.</li>
+</ul>
+
+<footer>ملف الطالب 1 · SecureStock · مسؤوليات فريق من 4 · مراجعة 2026</footer>
+</body>
+</html>

@@ -5,7 +5,13 @@ from sqlalchemy.exc import IntegrityError
 from ..extensions import db
 from ..forms import ResetPasswordForm, UserForm
 from ..models import AuditLog, User
-from ..security import hash_password, role_required, sanitize_text, validate_password
+from ..security import (
+    hash_password,
+    new_session_token,
+    role_required,
+    sanitize_text,
+    validate_password,
+)
 
 users_bp = Blueprint("users", __name__, url_prefix="/users")
 
@@ -97,6 +103,9 @@ def reset_password(user_id):
         # A password reset also clears any lockout so the user can log in again.
         user.failed_attempts = 0
         user.locked_until = None
+        # Rotate the security stamp: all of the target user's sessions are
+        # invalidated so a compromised session cannot survive a reset.
+        user.session_token = new_session_token()
         db.session.add(AuditLog(user_id=current_user.id, action="PASSWORD_RESET",
                                 entity="User", entity_id=user.id,
                                 ip_address=request.remote_addr))

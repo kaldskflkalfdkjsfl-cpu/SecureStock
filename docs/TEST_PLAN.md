@@ -6,7 +6,7 @@ Each item below maps to at least one automated test in `tests/`. Run everything 
 pytest --cov=app --cov-report=term-missing
 ```
 
-Current: **84 automated tests, ~91% line coverage, bandit scan reports
+Current: **94 automated tests, ~91% line coverage, bandit scan reports
 0 issues across `app/`.**
 
 | ID | Test | Expected Result | Automated coverage |

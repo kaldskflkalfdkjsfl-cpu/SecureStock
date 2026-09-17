@@ -9,6 +9,7 @@ from ..extensions import db, limiter
 from ..forms import ChangePasswordForm
 from ..models import AuditLog
 from ..security import (
+    bind_session,
     generate_totp_secret,
     hash_password,
     totp_provisioning_uri,
@@ -119,12 +120,29 @@ def change_password():
             return render_template("profile/password.html", form=form)
 
         current_user.password_hash = hash_password(form.new_password.data)
+        # Rotate the security stamp so every other session of this user is
+        # invalidated immediately; the current device is rebound below.
+        bind_session(current_user, rotate=True)
         db.session.add(AuditLog(user_id=current_user.id, action="PASSWORD_CHANGED",
                                 entity="User", entity_id=current_user.id,
                                 ip_address=request.remote_addr))
         db.session.commit()
-        # Refresh the session so the new password hash is re-validated server-side.
+        # Re-establish the current session with the freshly rotated stamp.
         login_user(current_user, remember=False, fresh=True)
         flash("Password changed successfully.", "success")
         return redirect(url_for("profile.index"))
     return render_template("profile/password.html", form=form)
+
+
+@profile_bp.post("/logout-all")
+@login_required
+def logout_all():
+    """Invalidate every other active session of the current user."""
+    bind_session(current_user, rotate=True)
+    db.session.add(AuditLog(user_id=current_user.id, action="SESSIONS_REVOKED",
+                            entity="User", entity_id=current_user.id,
+                            ip_address=request.remote_addr))
+    db.session.commit()
+    login_user(current_user, remember=False, fresh=True)
+    flash("All other sessions have been signed out.", "success")
+    return redirect(url_for("profile.index"))

@@ -2,44 +2,52 @@
 {% from "_pagination.html" import render_pagination %}
 {% block title %}Inventory — SecureStock{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center">
-<h1 class="h3">Inventory</h1>
+<div class="ss-page-head">
+  <div>
+    <h1 class="ss-page-title"><span class="ss-title-icon"><i class="bi bi-boxes"></i></span>Inventory</h1>
+    <p class="ss-page-sub">Stock levels and adjustments</p>
+  </div>
 </div>
-<form class="my-3" method="get">
-  <div class="input-group" style="max-width:380px">
+
+<form class="mb-3" method="get">
+  <div class="input-group ss-search">
+    <span class="input-group-text"><i class="bi bi-search"></i></span>
     <input name="q" value="{{ q }}" class="form-control" placeholder="Search by name">
     <button class="btn btn-outline-secondary" type="submit">Search</button>
   </div>
 </form>
+
+<div class="ss-table-wrap">
 <div class="table-responsive">
-<table class="table table-striped bg-white shadow-card align-middle">
+<table class="table table-hover align-middle">
 <thead><tr><th>Product</th><th>Current Stock</th><th>Threshold</th><th>Status</th><th>Adjustment</th></tr></thead>
 <tbody>
 {% for p in products.items %}
 <tr>
-<td>{{ p.name }}</td>
+<td class="fw-semibold">{{ p.name }}</td>
 <td>{{ p.quantity }}</td>
 <td>{{ p.low_stock_threshold }}</td>
 <td>
 {% if p.quantity == 0 %}<span class="badge bg-danger">Out of stock</span>
-{% elif p.quantity <= p.low_stock_threshold %}<span class="badge bg-warning text-dark">Low</span>
+{% elif p.quantity <= p.low_stock_threshold %}<span class="badge bg-warning">Low</span>
 {% else %}<span class="badge bg-success">OK</span>{% endif %}
 </td>
 <td>
 {% if current_user.role in ['admin','manager'] %}
 <form method="post" action="{{ url_for('inventory.adjust', product_id=p.id) }}" class="d-flex gap-2">
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-<input class="form-control form-control-sm" type="number" name="amount" value="0" style="max-width:130px">
-<button class="btn btn-sm btn-primary">Apply</button>
+<input class="form-control form-control-sm ss-input-narrow" type="number" name="amount" value="0">
+<button class="btn btn-sm btn-primary"><i class="bi bi-arrow-repeat me-1"></i>Apply</button>
 </form>
-{% else %}<span class="text-muted small">Read only</span>{% endif %}
+{% else %}<span class="text-muted small"><i class="bi bi-lock me-1"></i>Read only</span>{% endif %}
 </td>
 </tr>
 {% else %}
-<tr><td colspan="5" class="text-center text-muted py-4">No products found.</td></tr>
+<tr><td colspan="5" class="text-center text-muted py-4"><i class="bi bi-inbox fs-4 d-block mb-1"></i>No products found.</td></tr>
 {% endfor %}
 </tbody>
 </table>
+</div>
 </div>
 {{ render_pagination(products, 'inventory.index') }}
 {% endblock %}

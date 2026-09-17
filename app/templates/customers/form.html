@@ -2,12 +2,16 @@
 {% from "_forms.html" import render_field %}
 {% block title %}{{ title }} — SecureStock{% endblock %}
 {% block content %}
-<h1 class="h3">{{ title }}</h1>
-<form method="post" class="card card-body shadow-card" style="max-width:640px">
+<h1 class="ss-page-title mb-3"><span class="ss-title-icon"><i class="bi bi-person-lines-fill"></i></span>{{ title }}</h1>
+<form method="post" class="card card-body ss-form">
 {{ form.hidden_tag() }}
 {{ render_field(form.name) }}
 {{ render_field(form.email) }}
 {{ render_field(form.phone) }}
+<div class="form-text mb-3"><i class="bi bi-shield-lock me-1"></i>Phone numbers are encrypted at rest with Fernet.</div>
+<div>
 {{ form.submit(class="btn btn-primary") }}
+<a class="btn btn-outline-secondary" href="{{ url_for('customers.index') }}">Cancel</a>
+</div>
 </form>
 {% endblock %}

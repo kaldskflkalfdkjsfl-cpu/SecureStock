@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SecureStock — Deliverable & Discussion Document</title>
+<style>
+  :root { --accent:#0f4c81; --accent2:#e8f0fa; --border:#cdd8e4; --muted:#5b6b7c; }
+  * { box-sizing:border-box; }
+  body { font-family:"Segoe UI","Tahoma","Arial",sans-serif; color:#22303c;
+         background:#fff; margin:0 auto; max-width:920px; padding:24px 32px 60px; line-height:1.6; }
+  h1,h2,h3 { color:var(--accent); line-height:1.3; }
+  h1 { font-size:1.9em; margin:8px 0 4px; }
+  h1 span.ar { display:block; color:var(--muted); font-size:.62em; font-weight:600; }
+  h2 { border-bottom:2px solid var(--accent2); padding-bottom:6px; margin-top:40px; font-size:1.3em; }
+  h3 { font-size:1.05em; margin-top:24px; }
+  p.ar { color:#32404d; }
+  .cover { background:var(--accent2); border:1px solid var(--border); border-radius:10px;
+           padding:18px 22px; margin-bottom:22px; }
+  .cover h1 { margin-top:0; }
+  table { border-collapse:collapse; width:100%; margin:12px 0; font-size:.92em; }
+  th,td { border:1px solid var(--border); padding:7px 9px; text-align:left; vertical-align:top; }
+  th { background:var(--accent); color:#fff; font-weight:600; }
+  tr:nth-child(even) td { background:#f7fafc; }
+  pre { background:#0f1c28; color:#cdd9e5; border-radius:8px; padding:12px 14px; overflow-x:auto;
+        font-size:.88em; }
+  code { font-family:Consolas,"Cascadia Mono",monospace; }
+  .kbd { display:inline-block; background:#eef3f8; border:1px solid var(--border); border-radius:5px;
+         padding:1px 7px; font-family:Consolas,monospace; font-size:.88em; }
+  .qabox { border-left:4px solid var(--accent); background:#f3f8fd; padding:10px 14px; margin:10px 0; }
+  .note { background:#fff8e6; border:1px solid #f0dda0; border-radius:8px; padding:10px 14px; }
+  .badge { display:inline-block; background:#177245; color:#fff; border-radius:999px;
+           padding:2px 12px; font-size:.8em; font-weight:700; }
+  ul { padding-left:20px; }
+  li { margin:3px 0; }
+  h2 > span.ar { display:block; color:var(--muted); font-size:.7em; font-weight:600; }
+  footer { margin-top:48px; border-top:1px solid var(--border); padding-top:12px;
+           color:var(--muted); font-size:.85em; }
+  .toc { columns:2; column-gap:28px; font-size:.92em; }
+  nav a { color:var(--accent); text-decoration:none; }
+  @media print {
+    a { color:inherit; }
+    body { max-width:100%; padding:0; }
+    h2 { break-after:avoid; }
+    table, pre { break-inside:avoid; }
+    .toc { columns:1; }
+  }
+</style>
+</head>
+<body>
+
+<header class="cover">
+  <h1>SecureStock <span class="ar">نظام إدارة المخزون والمبيعات الآمن — وثيقة التسليم والمناقشة</span>
+    <span style="display:block;font-size:.55em;font-weight:400;color:var(--muted);margin-top:6px;">
+      Secure Inventory &amp; Sales Management System — Deliverable &amp; Discussion Document</span>
+  </h1>
+  <table>
+    <tr><th>Project</th><td>SecureStock — Flask secure programming practical</td></tr>
+    <tr><th>Student</th><td>[Your Name] — [Student ID]</td></tr>
+    <tr><th>Course</th><td>Security Programming Practical Project</td></tr>
+    <tr><th>Stack</th><td>Python 3.11+ · Flask 3.1 · SQLAlchemy 2 · SQLite</td></tr>
+    <tr><th>Repository</th><td>github.com/kaldskflkalfdkjsfl-cpu/SecureStock</td></tr>
+    <tr><th>Verification</th><td><span class="badge">94 tests</span> <span class="badge">~91% coverage</span> <span class="badge">bandit 0 issues</span></td></tr>
+  </table>
+</header>
+
+<nav>
+  <details open><summary><strong>Contents / المحتويات</strong></summary>
+  <div class="toc">
+    1. Overview / نظرة عامة<br>
+    2. Security Requirements Engineering / هندسة المتطلبات<br>
+    3. Abuse &amp; Security Use Cases / حالات الإساءة والاستخدام<br>
+    4. Threat Modeling — STRIDE &amp; DREAD<br>
+    5. Security Algorithms in Practice / الخوارزميات<br>
+    6. Implementation Mapping / خريطة التنفيذ<br>
+    7. RBAC Matrix<br>
+    8. Data Model (ERD)<br>
+    9. Verification &amp; Testing / التحقق والاختبار<br>
+    10. Deployment / النشر<br>
+    11. Ready-To-Run Discussion Script / دليل العرض<br>
+    12. Likely Discussion Questions / أسئلة المناقشة<br>
+    13. References / المراجع
+  </div>
+  </details>
+</nav>
+
+<h2>1. Overview <span class="ar">نظرة عامة</span></h2>
+<p>SecureStock is a complete <strong>inventory and sales management system</strong> built with Flask,
+designed as a <em>secure programming</em> exercise. Every layer applies defense-in-depth: strong
+authentication, role-based access control, encrypted sensitive data, sanitized input/output,
+transactional business logic, and a full audit trail.</p>
+<p class="ar">سيكنستوك نظام متكامل لإدارة المخزون والمبيعات بإطار Flask، صُمِّم كتمرين برمجي آمن: مصادقة
+قوية، تحكم بالصلاحيات، تشفير البيانات الحساسة، تعقيم الإدخال والإخراج، معاملات متكاملة، وسجل تدقيق شامل.</p>
+
+<h3>1.1 Functional Scope</h3>
+<ul>
+  <li>User management (admin) with pagination</li>
+  <li>Product &amp; customer CRUD</li>
+  <li>Inventory adjustments — quantity never negative</li>
+  <li>Transactional sales — stock check, Sale/SaleItem, atomic rollback</li>
+  <li>TOTP two-factor authentication &amp; password lifecycle</li>
+  <li>Audit-trail viewer (admin only)</li>
+</ul>
+
+<h3>1.2 Tech Stack</h3>
+<table>
+  <tr><th>Layer</th><th>Technology</th></tr>
+  <tr><td>Language</td><td>Python 3.11–3.13</td></tr>
+  <tr><td>Web framework</td><td>Flask 3.1</td></tr>
+  <tr><td>ORM (parameterized)</td><td>Flask-SQLAlchemy 2</td></tr>
+  <tr><td>Forms / CSRF</td><td>Flask-WTF</td></tr>
+  <tr><td>Auth</td><td>Flask-Login + Werkzeug scrypt</td></tr>
+  <tr><td>Encryption</td><td>cryptography — Fernet</td></tr>
+  <tr><td>2FA</td><td>pyotp (RFC 6238 TOTP)</td></tr>
+  <tr><td>Sanitization</td><td>bleach</td></tr>
+  <tr><td>Rate limiting</td><td>Flask-Limiter</td></tr>
+  <tr><td>Migrations</td><td>Flask-Migrate</td></tr>
+  <tr><td>Server</td><td>Waitress (production) / Flask dev</td></tr>
+  <tr><td>Ops</td><td>Docker, docker-compose, GitHub Actions CI</td></tr>
+  <tr><td>Quality</td><td>pytest · pytest-cov · ruff · bandit</td></tr>
+</table>
+
+<h2>2. Security Requirements Engineering <span class="ar">هندسة المتطلبات الأمنية</span></h2>
+<h3>2.1 Assets — exactly 5 <span class="ar">الأصول — 5</span></h3>
+<table>
+  <tr><th>ID</th><th>Asset</th><th>العربي</th></tr>
+  <tr><td>A1</td><td>User Credentials</td><td>بيانات اعتماد المستخدمين</td></tr>
+  <tr><td>A2</td><td>Customer Sensitive Data</td><td>البيانات الحساسة للعملاء</td></tr>
+  <tr><td>A3</td><td>Product &amp; Inventory Data</td><td>بيانات المنتجات والمخزون</td></tr>
+  <tr><td>A4</td><td>Sales &amp; Transaction Records</td><td>سجلات المبيعات والمعاملات</td></tr>
+  <tr><td>A5</td><td>Encryption Keys &amp; Security Configuration</td><td>مفاتيح التشفير والإعدادات الأمنية</td></tr>
+</table>
+
+<h3>2.2 Threats — exactly 5 <span class="ar">التهديدات — 5</span></h3>
+<table>
+  <tr><th>ID</th><th>Threat</th><th>العربي</th></tr>
+  <tr><td>T1</td><td>SQL Injection</td><td>حقن SQL</td></tr>
+  <tr><td>T2</td><td>Cross-Site Scripting (XSS)</td><td>البرمجة النصية عبر المواقع</td></tr>
+  <tr><td>T3</td><td>Unauthorized Access</td><td>وصول غير مصرّح به</td></tr>
+  <tr><td>T4</td><td>CSRF / IDOR</td><td>تزوير الطلبات / الوصول المباشر غير المصرح</td></tr>
+  <tr><td>T5</td><td>Credential Attack (Brute Force)</td><td>هجوم البيانات الاعتمادية</td></tr>
+</table>
+
+<h3>2.3 Security Requirements — exactly 4 <span class="ar">المتطلبات الأمنية — 4</span></h3>
+<div class="qabox"><strong>SR1 — Secure Authentication · مصادقة آمنة</strong><br>
+scrypt hashing, optional TOTP 2FA, lockout after 3 failures, login rate-limiting,
+constant-time authentication against account existence.</div>
+<div class="qabox"><strong>SR2 — Access Control · التحكم في الوصول</strong><br>
+RBAC (Admin/Manager/Employee) enforced server-side on every endpoint via <code>role_required()</code>.</div>
+<div class="qabox"><strong>SR3 — Data Protection · حماية البيانات</strong><br>
+Customer phone Fernet-encrypted; passwords scrypt-hashed; secure session cookies; keys in environment only.</div>
+<div class="qabox"><strong>SR4 — Secure Input and Requests · إدخال وطلبات آمنة</strong><br>
+Validation on all forms, bleach sanitization, CSRF tokens, parameterized queries,
+upload signature checks, security headers + CSP.</div>
+
+<h2>3. Abuse Cases &amp; Security Use Cases <span class="ar">حالات الإساءة والاستخدام الأمني</span></h2>
+<h3>3.1 Abuse Cases — exactly 4</h3>
+<table>
+  <tr><th>ID</th><th>Case</th><th>Defense</th></tr>
+  <tr><td>AC1</td><td>SQL Injection via search/forms</td><td>Parameterized queries + LIKE-escape</td></tr>
+  <tr><td>AC2</td><td>XSS in name/description</td><td>Jinja autoescape + bleach</td></tr>
+  <tr><td>AC3</td><td>Unauthorized access (IDOR / privilege)</td><td><code>role_required</code> + ownership checks</td></tr>
+  <tr><td>AC4</td><td>Brute-force login</td><td>Lockout + rate limit + constant-time compare</td></tr>
+</table>
+<h3>3.2 Security Use Cases — exactly 4</h3>
+<ul>
+  <li><strong>SUC1 — Secure Login:</strong> validate input → locate user → verify scrypt hash
+      (constant-time, dummy-hash for unknown) → lock check → (TOTP if enabled) → session → audit.</li>
+  <li><strong>SUC2 — Authorized CRUD:</strong> authenticate → authorize → validate/sanitize → CRUD → audit.</li>
+  <li><strong>SUC3 — Secure Sale Transaction:</strong> validate → check stock → Sale → SaleItem →
+      decrement → commit; any exception → full rollback (atomically tested).</li>
+  <li><strong>SUC4 — Secure Sensitive Data Access:</strong> authenticate → authorize → decrypt (Fernet)
+      → display via authorized pages only.</li>
+</ul>
+
+<h2>4. Threat Modeling — STRIDE &amp; DREAD <span class="ar">نمذجة التهديدات</span></h2>
+<h3>4.1 STRIDE</h3>
+<table>
+  <tr><th>Category</th><th>Example</th><th>Control</th></tr>
+  <tr><td>Spoofing</td><td>password / TOTP attack</td><td>scrypt + lockout + limiter + TOTP</td></tr>
+  <tr><td>Tampering</td><td>unauthorized inventory change</td><td>RBAC + validation + transactions</td></tr>
+  <tr><td>Repudiation</td><td>denying a sale</td><td>AuditLog trail</td></tr>
+  <tr><td>Information Disclosure</td><td>exposing customer phone</td><td>Fernet encryption + authorization</td></tr>
+  <tr><td>Denial of Service</td><td>repeated logins</td><td>Flask-Limiter</td></tr>
+  <tr><td>Elevation of Privilege</td><td>employee hitting admin routes</td><td>role checks on every endpoint</td></tr>
+</table>
+<h3>4.2 DREAD (1–10, Risk = average)</h3>
+<table>
+  <tr><th>Threat</th><th>D</th><th>R</th><th>E</th><th>A</th><th>D</th><th>Average</th></tr>
+  <tr><td>SQL Injection</td><td>9</td><td>8</td><td>8</td><td>9</td><td>7</td><td><strong>8.2</strong></td></tr>
+  <tr><td>XSS</td><td>6</td><td>8</td><td>7</td><td>7</td><td>8</td><td><strong>7.2</strong></td></tr>
+  <tr><td>Unauthorized Access</td><td>9</td><td>7</td><td>7</td><td>9</td><td>6</td><td><strong>7.6</strong></td></tr>
+  <tr><td>CSRF / IDOR</td><td>8</td><td>7</td><td>7</td><td>8</td><td>7</td><td><strong>7.4</strong></td></tr>
+  <tr><td>Credential Attack</td><td>7</td><td>9</td><td>8</td><td>6</td><td>8</td><td><strong>7.6</strong></td></tr>
+</table>
+<p>Top risks (SQL Injection, Unauthorized Access, Credential Attack) receive priority controls before release.</p>
+
+<h2>5. Security Algorithms in Practice <span class="ar">الخوارزميات الأمنية تطبيقياً</span></h2>
+<h3>5.1 Password Hashing — scrypt <code>app/security.py</code></h3>
+<pre>generate_password_hash(password, method="scrypt")
+# format: scrypt:32768:8:1$salt$hash</pre>
+<ul>
+  <li>Memory-hard KDF (RFC 7914) → resists GPU/ASIC parallel brute force.</li>
+  <li>Per-user random salt → resists rainbow tables.</li>
+  <li>Verification uses <code>hmac.compare_digest</code> → constant-time comparison.</li>
+</ul>
+
+<h3>5.2 Session &amp; CSRF Signing — HMAC-SHA256</h3>
+<ul>
+  <li>Session cookie signed with <code>SECRET_KEY</code> (itsdangerous → HMAC-SHA256 + timestamp).</li>
+  <li>CSRF: synchronizer-token pattern, session-bound, 1-hour expiry (<code>WTF_CSRF_TIME_LIMIT=3600</code>).</li>
+</ul>
+
+<h3>5.3 At-Rest Encryption — Fernet</h3>
+<p><code>Fernet = AES-128-CBC + HMAC-SHA256 (encrypt-then-MAC) + random IV + timestamp</code>.<br>
+Applied to <code>Customer.phone_encrypted</code>; invalid token → <code>[unavailable]</code>.</p>
+
+<h3>5.4 TOTP 2FA — HMAC-SHA1 (RFC 6238)</h3>
+<p><code>TOTP = Truncate(HMAC-SHA1(secret, floor(time/30)))</code> — 6 digits every 30 s,
+<code>valid_window=1</code> tolerance; QR via <code>otpauth://totp/SecureStock:...</code></p>
+
+<h3>5.5 Anti-Enumeration / Timing</h3>
+<p>Login verifies against <code>DUMMY_HASH</code> when the account does not exist, so timing does not
+reveal account existence; one generic error message in all failure paths.</p>
+
+<h3>5.6 Input &amp; Output Hardening</h3>
+<ul>
+  <li><strong>SQLi:</strong> parameterized ORM queries + LIKE wildcard escaping (<code>%</code>, <code>_</code>, <code>\</code>).</li>
+  <li><strong>XSS:</strong> Jinja2 autoescape + <code>bleach.clean()</code> strip-all + length cap.</li>
+  <li><strong>Uploads:</strong> extension whitelist + magic bytes (<code>%PDF</code>, <code>\x89PNG</code>, <code>\xff\xd8\xff</code>)
+      + <code>secure_filename</code> + resolved-path containment + 2 MB limit.</li>
+  <li><strong>Regex validation:</strong> email, phone, 6-digit TOTP, strong password policy.</li>
+</ul>
+
+<h3>5.7 Session Hardening &amp; Headers</h3>
+<p><code>HttpOnly</code> · <code>SameSite=Lax</code> · <code>Secure</code> (env) · 8-hour absolute cookie lifetime,
+plus server-enforced <strong>30-min idle</strong> and <strong>8-hour absolute</strong> timeouts
+(<code>config.py:22-26</code>, checked per request in <code>user_loader</code>, <code>__init__.py:31-43</code>).
+Every session also carries a server-side <strong>revocable stamp</strong> (<code>User.session_token</code>,
+<code>models.py:18</code>): rotating it instantly invalidates all other sessions on password change
+(<code>profile.py:125</code>), admin reset (<code>users.py:108</code>) and "sign out all devices"
+(<code>profile.py:138-148</code>). Verified by <code>tests/test_session_security.py</code>.<br>
+Headers: <code>X-Content-Type-Options: nosniff</code>, <code>X-Frame-Options: DENY</code>,
+<code>Referrer-Policy</code>, strict Content-Security-Policy.</p>
+
+<h2>6. Implementation Mapping <span class="ar">خريطة التنفيذ</span></h2>
+<table>
+  <tr><th>Requirement</th><th>Implementation</th></tr>
+  <tr><td>CRUD</td><td>Users, Products, Customers + pagination</td></tr>
+  <tr><td>Real DB / Transactions</td><td>SQLAlchemy; Sale + SaleItem + stock, rollback tested</td></tr>
+  <tr><td>RBAC</td><td><code>role_required("admin", ...)</code> decorator</td></tr>
+  <tr><td>XSS / CSRF / SQLi / IDOR</td><td>autoescape+bleach / Flask-WTF / ORM / ownership checks</td></tr>
+  <tr><td>Path traversal</td><td><code>secure_filename</code> + resolved path + signature check</td></tr>
+  <tr><td>Auth / 2FA / Crypto</td><td>Flask-Login + scrypt / pyotp TOTP / Fernet</td></tr>
+  <tr><td>Sessions / Errors / Limiter / Lockout</td><td>cookie flags / styled handlers / Flask-Limiter / failed_attempts</td></tr>
+  <tr><td>Audit / Password lifecycle / Separation</td><td>AuditLog + viewer / self-change + admin reset / models-routes-templates</td></tr>
+</table>
+
+<h2>7. RBAC Matrix</h2>
+<table>
+  <tr><th>Operation</th><th>Admin</th><th>Manager</th><th>Employee</th></tr>
+  <tr><td>Dashboard</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+  <tr><td>Manage users / reset passwords</td><td>Yes</td><td>No</td><td>No</td></tr>
+  <tr><td>Products CRUD</td><td>Yes</td><td>Yes</td><td>Read-only</td></tr>
+  <tr><td>Customers create</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+  <tr><td>Customers update/delete</td><td>Yes</td><td>Yes</td><td>No</td></tr>
+  <tr><td>Inventory adjust</td><td>Yes</td><td>Yes</td><td>No</td></tr>
+  <tr><td>Create sales</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+  <tr><td>Read own sales</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+  <tr><td>Read all sales</td><td>Yes</td><td>Yes</td><td>No</td></tr>
+  <tr><td>View audit log</td><td>Yes</td><td>No</td><td>No</td></tr>
+  <tr><td>Profile / password / 2FA</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+</table>
+
+<h2>8. Data Model (ERD)</h2>
+<pre>USER ─1:N─ SALE ─1:N─ SALE_ITEM ─N:1─ PRODUCT
+USER ─1:N─ AUDIT_LOG (user_id nullable)
+CUSTOMER ─1:N─ SALE
+
+User:     id, email(unique), name, password_hash, role, failed_attempts, locked_until, totp_secret
+Product:  id, name, description, price, quantity, low_stock_threshold
+Customer: id, name, email, phone_encrypted
+Sale:     id, customer_id, user_id, total
+SaleItem: id, sale_id, product_id, quantity, unit_price
+AuditLog: id, user_id, action, entity, entity_id, ip_address, created_at</pre>
+<p>All timestamps stored UTC; <code>is_locked()</code> normalizes naive datetimes for portability.</p>
+
+<h2>9. Verification &amp; Testing <span class="ar">التحقق والاختبار</span></h2>
+<pre>pip install -r requirements-dev.txt
+ruff check app tests                        # static lint
+bandit -r app                               # security scan
+pytest --cov=app --cov-report=term-missing  # 94 tests, ~91% coverage</pre>
+<table>
+  <tr><th>Check</th><th>Result</th></tr>
+  <tr><td>pytest</td><td><strong>94 passed</strong></td></tr>
+  <tr><td>Coverage (app/)</td><td><strong>~91%</strong></td></tr>
+  <tr><td>bandit (app)</td><td><strong>0 issues</strong></td></tr>
+  <tr><td>ruff</td><td><strong>All checks passed</strong></td></tr>
+  <tr><td>CI (GitHub Actions)</td><td>Python 3.11 &amp; 3.12: lint + tests + bandit + secrets scan</td></tr>
+</table>
+
+<h3>9.1 Security checklist (all automated)</h3>
+<ol>
+  <li>3 wrong passwords → lockout (timezone-safe)</li>
+  <li>Unknown email → same error message &amp; timing</li>
+  <li>Employee → <code>/users/</code> = 403</li>
+  <li>Employee opens another employee's sale = 403 (IDOR)</li>
+  <li><code>&lt;script&gt;</code> rendered as text (no XSS)</li>
+  <li>SQL-like search string treated as data</li>
+  <li>POST without CSRF token = 400</li>
+  <li><code>../../secret.txt</code> upload rejected</li>
+  <li>PNG renamed to <code>.txt</code> rejected (magic bytes)</li>
+  <li>Insufficient-stock sale rejected atomically</li>
+  <li>Negative inventory adjustment rejected</li>
+  <li>Customer phone encrypted at rest</li>
+  <li>Passwords stored as scrypt hashes, never plaintext</li>
+  <li>Login rate limit returns 429</li>
+  <li>TOTP second factor enforced end-to-end</li>
+  <li>Admin cannot delete self; reset unlocks account</li>
+  <li>Every security event recorded in the audit trail</li>
+</ol>
+<div class="note"><strong>Note:</strong> test isolation is guarded — a dedicated test verifies fixtures never bind
+to the production <code>instance/securestock.db</code>.</div>
+
+<h2>10. Deployment <span class="ar">النشر</span></h2>
+<ul>
+  <li><strong>Production:</strong> <code>python seed.py &amp;&amp; python serve.py</code> (Waitress) → http://127.0.0.1:5000</li>
+  <li><strong>Docker:</strong> <code>docker compose up --build</code> — non-root user, DB/uploads volumes, healthcheck</li>
+  <li><strong>Migrations:</strong> <code>flask db upgrade</code></li>
+  <li><strong>CI:</strong> GitHub Actions on every push/PR (<code>master</code>/<code>main</code>)</li>
+  <li><strong>Environment:</strong> <code>.env</code> → <code>SECRET_KEY</code>, <code>FERNET_KEY</code>, <code>SESSION_COOKIE_SECURE</code></li>
+</ul>
+<h3>Demo accounts (change before production)</h3>
+<table>
+  <tr><th>Role</th><th>Email</th><th>Password</th></tr>
+  <tr><td>Admin</td><td>admin@securestock.example.com</td><td>ChangeMe123!</td></tr>
+  <tr><td>Manager</td><td>manager@securestock.example.com</td><td>ChangeMe123!</td></tr>
+  <tr><td>Employee</td><td>employee@securestock.example.com</td><td>ChangeMe123!</td></tr>
+</table>
+<div class="note"><strong>Note:</strong> <code>.local</code> is a reserved TLD (RFC 6762) and fails email validation,
+so the seed uses <code>.example.com</code>.</div>
+
+<h2>11. Ready-To-Run Discussion Script <span class="ar">دليل العرض الجاهز</span></h2>
+<ol>
+  <li><strong>Employee login</strong> → dashboard → create customer → create sale → inventory decreases
+      → open sale detail (own sales only).</li>
+  <li><strong>Denial demos:</strong> <code>/users/</code> as employee → 403; another employee's sale → 403;
+      <code>&lt;script&gt;</code> in product name → safe output; SQL-like search → data treated as data.</li>
+  <li><strong>CSRF demo:</strong> curl a POST without token → 400.</li>
+  <li><strong>Upload demo:</strong> <code>../../secret.txt</code> and renamed <code>fake.png</code> → rejected.</li>
+  <li><strong>Lockout demo:</strong> 3 wrong passwords → locked 15 min (audited).</li>
+  <li><strong>2FA demo:</strong> enable TOTP in Profile → scan QR → logout → second factor at login.</li>
+  <li><strong>Password lifecycle:</strong> self-change (old required); admin reset (also unlocks) → audited.</li>
+  <li><strong>DB evidence:</strong> scrypt hashes, Fernet ciphertext.</li>
+  <li><strong>Audit trail demo</strong> (admin): LOGIN*, TFA_*, PASSWORD_*, INVENTORY_ADJUSTED, USER_CREATED, SALE_*.</li>
+  <li><strong>Quality evidence:</strong> <code>pytest</code> (94), <code>bandit</code> (0), CI output/badges.</li>
+</ol>
+
+<h2>12. Likely Discussion Questions <span class="ar">أبرز أسئلة المناقشة</span></h2>
+<div class="qabox"><strong>Why scrypt and not SHA-256?</strong> Memory-hard KDF → resists GPU/ASIC parallel brute
+force; salted → resists rainbow tables.</div>
+<div class="qabox"><strong>Why Fernet for the phone?</strong> Encrypt-then-MAC (AES-CBC + HMAC) → confidentiality
+and integrity; misuse-resistant by design.</div>
+<div class="qabox"><strong>Can CSRF be bypassed?</strong> Session-bound tokens, 1-h expiry, SameSite=Lax, and
+<code>SESSION_COOKIE_SECURE</code> in production — layered.</div>
+<div class="qabox"><strong>How do you prevent SQLi with LIKE?</strong> ORM binds parameters; wildcards explicitly
+escaped so <code>%</code>/<code>_</code> stay data.</div>
+<div class="qabox"><strong>What if a sale fails mid-write?</strong> Commit after the full flow; on exception the DB
+session rolls back — verified by atomicity tests.</div>
+<div class="qabox"><strong>How does lockout survive timezones?</strong> UTC storage + naive-datetime normalization.</div>
+<div class="qabox"><strong>Why is the login page slow even for unknown users?</strong> Deliberate — a dummy scrypt
+compare equalizes timing (anti-enumeration).</div>
+
+<h2>13. References <span class="ar">المراجع</span></h2>
+<ul>
+  <li>RFC 7914 (scrypt) · RFC 6238 (TOTP) · RFC 6762 (.local reserved)</li>
+  <li>OWASP Top 10 · OWASP ASVS</li>
+  <li>Flask · Flask-SQLAlchemy · Flask-WTF · Werkzeug · cryptography (Fernet)</li>
+  <li>pytest · pytest-cov · ruff · bandit documentation</li>
+</ul>
+
+<footer>Prepared for submission &amp; defense — all verification results are reproducible with the commands in Section 9.
+Rev. 2026 · SecureStock</footer>
+
+</body>
+</html>
